@@ -1,0 +1,5 @@
+D:\ZNJKXT\ZNJKXT\SLSoft.EasyORM\bin\Debug\SLSoft.EasyORM.dll
+D:\ZNJKXT\ZNJKXT\SLSoft.EasyORM\bin\Debug\SLSoft.EasyORM.pdb
+D:\ZNJKXT\ZNJKXT\SLSoft.EasyORM\obj\Debug\ResolveAssemblyReference.cache
+D:\ZNJKXT\ZNJKXT\SLSoft.EasyORM\obj\Debug\SLSoft.EasyORM.dll
+D:\ZNJKXT\ZNJKXT\SLSoft.EasyORM\obj\Debug\SLSoft.EasyORM.pdb

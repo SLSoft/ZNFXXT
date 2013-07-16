@@ -1,0 +1,5 @@
+D:\ZNJKXT\ZNJKXT\SLSoft.Common\bin\Debug\SLSoft.Common.dll
+D:\ZNJKXT\ZNJKXT\SLSoft.Common\bin\Debug\SLSoft.Common.pdb
+D:\ZNJKXT\ZNJKXT\SLSoft.Common\obj\Debug\ResolveAssemblyReference.cache
+D:\ZNJKXT\ZNJKXT\SLSoft.Common\obj\Debug\SLSoft.Common.dll
+D:\ZNJKXT\ZNJKXT\SLSoft.Common\obj\Debug\SLSoft.Common.pdb
