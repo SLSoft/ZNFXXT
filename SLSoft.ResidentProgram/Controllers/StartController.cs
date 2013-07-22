@@ -1,49 +1,9 @@
-<<<<<<< HEAD
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.Mvc;
-using SLSoft.EasyORM;
-using System.Data;
-using System.Data.SqlClient;
-
-namespace SLSoft.ResidentProgram.Controllers
-{
-    public class StartController : Controller
-    {
-        //
-        // GET: /Start/
-
-        public ActionResult Index()
-        {
-            DBFactory factory = new DBFactory();
-
-            string strdb = "";
-            AbstractDB db = factory.CreateDB("mysql");
-            DataTable dt = db.ExecSql("select * from slsoft_ias_sys_t_users");
-            if (dt.Rows.Count > 0)
-            {
-                foreach (DataRow row in dt.Rows)
-                {
-                    strdb += row["UserName"].ToString()+"     ";
-                }
-            }
-            ViewBag.strdb = strdb;
-            return View();
-        }
-
-    }
-}
-
-=======
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.IO;
-using LitJson;
 using SLSoft.ResidentProgram.Models;
 
 namespace SLSoft.ResidentProgram.Controllers
@@ -105,10 +65,10 @@ namespace SLSoft.ResidentProgram.Controllers
         }
 
         //添加信息到访问明细表
-        private void Insert_T_Session(Information im)
-        { 
+        //private void Insert_T_Session(Information im)
+        //{ 
         
-        }
+        //}
 
         //是否同一次访问
         private bool IsSameVisited(string sessionid)
@@ -117,4 +77,3 @@ namespace SLSoft.ResidentProgram.Controllers
         }
     }
 }
->>>>>>> bb66da62eea5d7d03f4d932067cc4ec5551930a1

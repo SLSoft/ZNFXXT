@@ -5,6 +5,8 @@ SLSoft.Common/[Bb]in/
 SLSoft.IntelligentAnalysis/[Oo]bj/Debug/
 SLSoft.ResidentProgram/[Oo]bj/
 SLSoft.Common/[Oo]bj/
+SLSoft.EasyORM/[Oo]bj/
+SLSoft.EasyORM/[Bb]in/
 
 # mstest test results
 TestResults
