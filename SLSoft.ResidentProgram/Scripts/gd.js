@@ -3,7 +3,6 @@
     var moveType = ""; //移动终端类型
     var browserType = ""; //浏览器类型
     var bVersions = ""; //浏览器版本
-    alert("aa");
 
     getBrowser();
     chckeMove();
