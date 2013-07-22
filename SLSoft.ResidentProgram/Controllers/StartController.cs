@@ -5,6 +5,8 @@ using System.Web;
 using System.Web.Mvc;
 using System.IO;
 using SLSoft.ResidentProgram.Models;
+using SLSoft.EasyORM;
+using MySql.Data.MySqlClient;
 
 namespace SLSoft.ResidentProgram.Controllers
 {
@@ -25,7 +27,7 @@ namespace SLSoft.ResidentProgram.Controllers
         
         public ActionResult GetData(FormCollection fc)
         {
-            
+            string sessionid = "";
 
             Information im = new Information();
             im.IsMove = fc["isMove"];//是否移动终端
@@ -54,26 +56,109 @@ namespace SLSoft.ResidentProgram.Controllers
             im.JavaApplets = Request.Browser.JavaApplets;//是否支持JAVA
             im.Frames = Request.Browser.Frames;//是否支持框架网页
 
+            if (!IsSameVisited(sessionid))
+            {
+                Insert_T_Session(im);
+            }
+            else
+            {
+                Insert_T_SessionDetails(im);
+            }
 
             return Json(new { });
         }
 
         //添加信息到访问表
         private void Insert_T_Session(Information im)
-        { 
-            
+        {
+            DBFactory df = new DBFactory();
+            AbstractDB db = df.CreateDB("mysql");
+
+            MySqlParameter[] mpara = new MySqlParameter[31];
+            mpara[0] = new MySqlParameter("StatisticsSite_ID", 1);
+            mpara[1] = new MySqlParameter("StatisticsSite_Code", new Guid());
+            mpara[2] = new MySqlParameter("SourceClass_ID", 1);
+            mpara[3] = new MySqlParameter("SourceClass_Code", "1");
+            mpara[4] = new MySqlParameter("SourcePath", im.PageUpUrl);
+            mpara[5] = new MySqlParameter("LastAccessPage", im.CurrentName);
+            mpara[6] = new MySqlParameter("LengthOfSession", 0);
+            mpara[7] = new MySqlParameter("SessionDepth", 0);
+            mpara[8] = new MySqlParameter("TZone", 0);
+            mpara[9] = new MySqlParameter("IsUV", 1);
+            mpara[10] = new MySqlParameter("IsNewUV", 1);
+            mpara[11] = new MySqlParameter("LastBrowsingTime", DateTime.Now);
+            mpara[12] = new MySqlParameter("NumberOfVisits", 1);
+            mpara[13] = new MySqlParameter("NetworkAccessProvider_ID", 0);
+            mpara[14] = new MySqlParameter("NetworkAccessProvider_Code", "");
+            mpara[15] = new MySqlParameter("Language", im.SysLanguage);
+            mpara[16] = new MySqlParameter("DeviceType", 0);
+            mpara[17] = new MySqlParameter("AboutDevice", "");
+            mpara[18] = new MySqlParameter("OperationSystem", im.OS);
+            mpara[19] = new MySqlParameter("Resolution", im.Size);
+            mpara[20] = new MySqlParameter("Color", im.VColor);
+            mpara[21] = new MySqlParameter("Browser", im.BrowserType);
+            mpara[22] = new MySqlParameter("BrowserEdition", im.BVersions);
+            mpara[23] = new MySqlParameter("BrowserKernel", "");
+            mpara[24] = new MySqlParameter("IsCookieSupport", 1);
+            mpara[25] = new MySqlParameter("IsJavaSupport", 1);
+            mpara[26] = new MySqlParameter("IsFrameWebpageSupport", 1);
+            mpara[27] = new MySqlParameter("Plugin", "");
+            mpara[28] = new MySqlParameter("ClientIP", im.UserHostAddress);
+            mpara[29] = new MySqlParameter("area", "");
+            mpara[30] = new MySqlParameter("ServerIP", im.ServerAddress);
+            db.ExecProNoquery("slsoft_ias_bus_p_insert_session", mpara);
         }
 
         //添加信息到访问明细表
-        //private void Insert_T_Session(Information im)
-        //{ 
-        
-        //}
+        private void Insert_T_SessionDetails(Information im)
+        { 
+            
+        }
 
         //是否同一次访问
         private bool IsSameVisited(string sessionid)
         {
             return false;
+        }
+
+        //是否独立访客（0:不是;1是）
+        private int IsUV()
+        {
+            return 0;
+        }
+
+        //是否新的独立访客（0:不是;1是）
+        private int IsNewUV()
+        {
+            return 0;
+        }
+
+        //获取IP归属地
+        private string GetAreaByIPAddress(string ipaddress)
+        {
+            return "";
+        }
+
+        //获取IP所属网络接入商
+        private string GetNAPByIPAddress(string ipaddress)
+        {
+            return "";
+        }
+
+        //访问来源类别（1.直接输入网址或书签 2.搜索引擎 3.内部链接 4.外部链接）
+        private int GetSourceClassID(string sourceurl)
+        {
+            if (sourceurl == "")
+                return 1;
+            if (sourceurl.IndexOf("baidu") > 0 || sourceurl.IndexOf("google") > 0)
+                return 2;
+            return 4;
+        }
+
+        //获取访问时长（秒）
+        private int GetLengthOfSession()
+        {
+            return 0;
         }
     }
 }

@@ -15,8 +15,8 @@ namespace SLSoft.EasyORM
             string strConn = "";
 
             string strConfigPath = System.Configuration.ConfigurationManager.AppSettings.Get("EasyORMConfigPath");
-            string Path = System.Web.HttpContext.Current.Server.MapPath(@"" + strConfigPath + "");
-
+            string Path = System.Web.HttpContext.Current.Server.MapPath("~")+ strConfigPath;
+            
             XmlDocument xml = new XmlDocument();
             xml.Load(Path);
             XmlNode node = null;

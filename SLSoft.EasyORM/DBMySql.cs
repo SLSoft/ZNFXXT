@@ -36,7 +36,7 @@ namespace SLSoft.EasyORM
 
         public override int ExecProNoquery(string strName, params MySqlParameter[] p)
         {
-            return MySqlHelper.ExecuteNonQuery(conn, CommandType.Text, strName, p);
+            return MySqlHelper.ExecuteNonQuery(conn, CommandType.StoredProcedure, strName, p);
         }
         public override DataTable ExecProcedure(string strName,SqlParameter[] p)
         {
