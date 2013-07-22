@@ -1,6 +1,12 @@
 # Build Folders (you can keep bin if you'd like, to store dlls and pdbs)
-[Bb]in/
-[Oo]bj/
+SLSoft.IntelligentAnalysis/[Bb]in/
+SLSoft.ResidentProgram/[Bb]in/
+SLSoft.Common/[Bb]in/
+SLSoft.IntelligentAnalysis/[Oo]bj/Debug/
+SLSoft.ResidentProgram/[Oo]bj/
+SLSoft.Common/[Oo]bj/
+SLSoft.EasyORM/[Oo]bj/
+SLSoft.EasyORM/[Bb]in/
 
 # mstest test results
 TestResults
@@ -36,6 +42,7 @@ x64/
 *.vspscc
 *.vssscc
 .builds
+*.csproj
 
 # Visual C++ cache files
 ipch/

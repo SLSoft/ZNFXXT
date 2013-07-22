@@ -1,7 +1,0 @@
-D:\ZNJKXT\ZNJKXT\SLSoft.IntelligentAnalysis\bin\SLSoft.IntelligentAnalysis.dll
-D:\ZNJKXT\ZNJKXT\SLSoft.IntelligentAnalysis\bin\SLSoft.IntelligentAnalysis.pdb
-D:\ZNJKXT\ZNJKXT\SLSoft.IntelligentAnalysis\bin\EntityFramework.dll
-D:\ZNJKXT\ZNJKXT\SLSoft.IntelligentAnalysis\bin\EntityFramework.xml
-D:\ZNJKXT\ZNJKXT\SLSoft.IntelligentAnalysis\obj\Debug\ResolveAssemblyReference.cache
-D:\ZNJKXT\ZNJKXT\SLSoft.IntelligentAnalysis\obj\Debug\SLSoft.IntelligentAnalysis.dll
-D:\ZNJKXT\ZNJKXT\SLSoft.IntelligentAnalysis\obj\Debug\SLSoft.IntelligentAnalysis.pdb
