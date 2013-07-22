@@ -5,3 +5,10 @@ D:\ZNJKXT\ZNJKXT\SLSoft.IntelligentAnalysis\bin\EntityFramework.xml
 D:\ZNJKXT\ZNJKXT\SLSoft.IntelligentAnalysis\obj\Debug\ResolveAssemblyReference.cache
 D:\ZNJKXT\ZNJKXT\SLSoft.IntelligentAnalysis\obj\Debug\SLSoft.IntelligentAnalysis.dll
 D:\ZNJKXT\ZNJKXT\SLSoft.IntelligentAnalysis\obj\Debug\SLSoft.IntelligentAnalysis.pdb
+E:\ZNFXXT\SLSoft.IntelligentAnalysis\bin\SLSoft.IntelligentAnalysis.dll
+E:\ZNFXXT\SLSoft.IntelligentAnalysis\bin\SLSoft.IntelligentAnalysis.pdb
+E:\ZNFXXT\SLSoft.IntelligentAnalysis\bin\EntityFramework.dll
+E:\ZNFXXT\SLSoft.IntelligentAnalysis\bin\EntityFramework.xml
+E:\ZNFXXT\SLSoft.IntelligentAnalysis\obj\Debug\ResolveAssemblyReference.cache
+E:\ZNFXXT\SLSoft.IntelligentAnalysis\obj\Debug\SLSoft.IntelligentAnalysis.dll
+E:\ZNFXXT\SLSoft.IntelligentAnalysis\obj\Debug\SLSoft.IntelligentAnalysis.pdb
