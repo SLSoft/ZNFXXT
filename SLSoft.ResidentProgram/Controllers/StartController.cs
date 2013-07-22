@@ -4,7 +4,6 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.IO;
-using LitJson;
 using SLSoft.ResidentProgram.Models;
 
 namespace SLSoft.ResidentProgram.Controllers
@@ -26,7 +25,7 @@ namespace SLSoft.ResidentProgram.Controllers
         
         public ActionResult GetData(FormCollection fc)
         {
-            
+            string sessionid = "";
 
             Information im = new Information();
             im.IsMove = fc["isMove"];//是否移动终端
@@ -55,6 +54,14 @@ namespace SLSoft.ResidentProgram.Controllers
             im.JavaApplets = Request.Browser.JavaApplets;//是否支持JAVA
             im.Frames = Request.Browser.Frames;//是否支持框架网页
 
+            if (!IsSameVisited(sessionid))
+            {
+                Insert_T_Session(im);
+            }
+            else
+            {
+                Insert_T_SessionDetails(im);
+            }
 
             return Json(new { });
         }
@@ -66,15 +73,55 @@ namespace SLSoft.ResidentProgram.Controllers
         }
 
         //添加信息到访问明细表
-        private void Insert_T_Session(Information im)
+        private void Insert_T_SessionDetails(Information im)
         { 
-        
+            
         }
 
         //是否同一次访问
         private bool IsSameVisited(string sessionid)
         {
             return false;
+        }
+
+        //是否独立访客（0:不是;1是）
+        private int IsUV()
+        {
+            return 0;
+        }
+
+        //是否新的独立访客（0:不是;1是）
+        private int IsNewUV()
+        {
+            return 0;
+        }
+
+        //获取IP归属地
+        private string GetAreaByIPAddress(string ipaddress)
+        {
+            return "";
+        }
+
+        //获取IP所属网络接入商
+        private string GetNAPByIPAddress(string ipaddress)
+        {
+            return "";
+        }
+
+        //访问来源类别（1.直接输入网址或书签 2.搜索引擎 3.内部链接 4.外部链接）
+        private int GetSourceClassID(string sourceurl)
+        {
+            if (sourceurl == "")
+                return 1;
+            if (sourceurl.IndexOf("baidu") > 0 || sourceurl.IndexOf("google") > 0)
+                return 2;
+            return 4;
+        }
+
+        //获取访问时长（秒）
+        private int GetLengthOfSession()
+        {
+            return 0;
         }
     }
 }
