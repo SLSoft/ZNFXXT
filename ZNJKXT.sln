@@ -1,13 +1,34 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SLSoft.ResidentProgram", "SLSoft.ResidentProgram\SLSoft.ResidentProgram.csproj", "{ED8BAFB3-A946-4B99-887A-096095BE6977}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SLSoft.IntelligentAnalysis", "SLSoft.IntelligentAnalysis\SLSoft.IntelligentAnalysis.csproj", "{D0EE404F-469D-45C6-8564-0D0BCB72286E}"
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "WebSite", "..\..\WebSite\", "{1DBAEABB-4409-41AE-B91C-00A20EF48914}"
+	ProjectSection(WebsiteProperties) = preProject
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.0"
+		Debug.AspNetCompiler.VirtualPath = "/WebSite"
+		Debug.AspNetCompiler.PhysicalPath = "..\..\WebSite\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\WebSite\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/WebSite"
+		Release.AspNetCompiler.PhysicalPath = "..\..\WebSite\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\WebSite\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		VWDPort = "10678"
+		DefaultWebSiteLanguage = "Visual C#"
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SLSoft.Common", "SLSoft.Common\SLSoft.Common.csproj", "{A26AFC00-FB55-4A2D-8089-02613021664E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SLSoft.EasyORM", "SLSoft.EasyORM\SLSoft.EasyORM.csproj", "{C23C239B-C253-412B-8D87-7081D488FDE0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SLSoft.IntelligentAnalysis", "SLSoft.IntelligentAnalysis\SLSoft.IntelligentAnalysis.csproj", "{D0EE404F-469D-45C6-8564-0D0BCB72286E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SLSoft.ResidentProgram", "SLSoft.ResidentProgram\SLSoft.ResidentProgram.csproj", "{ED8BAFB3-A946-4B99-887A-096095BE6977}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,14 +36,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{ED8BAFB3-A946-4B99-887A-096095BE6977}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{ED8BAFB3-A946-4B99-887A-096095BE6977}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{ED8BAFB3-A946-4B99-887A-096095BE6977}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{ED8BAFB3-A946-4B99-887A-096095BE6977}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D0EE404F-469D-45C6-8564-0D0BCB72286E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D0EE404F-469D-45C6-8564-0D0BCB72286E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D0EE404F-469D-45C6-8564-0D0BCB72286E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D0EE404F-469D-45C6-8564-0D0BCB72286E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1DBAEABB-4409-41AE-B91C-00A20EF48914}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1DBAEABB-4409-41AE-B91C-00A20EF48914}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1DBAEABB-4409-41AE-B91C-00A20EF48914}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{1DBAEABB-4409-41AE-B91C-00A20EF48914}.Release|Any CPU.Build.0 = Debug|Any CPU
 		{A26AFC00-FB55-4A2D-8089-02613021664E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A26AFC00-FB55-4A2D-8089-02613021664E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A26AFC00-FB55-4A2D-8089-02613021664E}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -31,6 +48,14 @@ Global
 		{C23C239B-C253-412B-8D87-7081D488FDE0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C23C239B-C253-412B-8D87-7081D488FDE0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C23C239B-C253-412B-8D87-7081D488FDE0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D0EE404F-469D-45C6-8564-0D0BCB72286E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0EE404F-469D-45C6-8564-0D0BCB72286E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D0EE404F-469D-45C6-8564-0D0BCB72286E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D0EE404F-469D-45C6-8564-0D0BCB72286E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ED8BAFB3-A946-4B99-887A-096095BE6977}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED8BAFB3-A946-4B99-887A-096095BE6977}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED8BAFB3-A946-4B99-887A-096095BE6977}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED8BAFB3-A946-4B99-887A-096095BE6977}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
