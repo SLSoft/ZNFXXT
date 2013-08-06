@@ -7,6 +7,7 @@
     getBrowser();
     chckeMove();
     var bLanguage = navigator.language; //浏览器语言
+    var browserKernel = getBrowserKernel(); //浏览器内核
     var sysLanguage = navigator.systemLanguage; //系统语言
     var userLanguage = navigator.userLanguage; //用户语言
     var cpuType = navigator.cpuClass; //CPU类型，不支持火狐
@@ -20,15 +21,15 @@
     var pageUpUrl = document.referrer; //上一页URL
     var currentName = window.location.host; //当前域名
     var currentUrl = window.location; //当前URL
+    var currentUrlTitle = document.title; //当前URL标题
     var parentUrl = window.parent.location; //父窗口URL
-    var expTime = 1; //cookie过期时间
 
-    if (!bLanguage) {//判断IE浏览器使用语言
-        bLanguage = navigator.browserLanguage;
-    }
+    if (!bLanguage) { bLanguage = navigator.browserLanguage; }
+    if (!sysLanguage) { sysLanguage = navigator.language; }
+    if (!userLanguage) { userLanguage = navigator.language; }
     if (navigator.appName == "Netscape") { vColor = screen.pixelDepth; } else { vColor = screen.colorDepth; }
 
-    var strJSON = '{"isMove":"' + isMove + '","moveType":"' + moveType + '","browserType":"' + browserType + '","bVersions":"' + bVersions + '","bLanguage":"' + bLanguage + '","sysLanguage":"' + sysLanguage + '","userLanguage":"' + userLanguage + '","cpuType":"' + cpuType + '","OS":"' + OS + '","size":"' + size + '","isCookie":"' + isCookie + '","plugins":"' + plugins + '","vColor":"' + vColor + '","zone":"' + zone + '","pageUpUrl":"' + pageUpUrl + '","currentName":"' + currentName + '","currentUrl":"' + currentUrl + '","parentUrl":"' + parentUrl + '","expTime":"' + expTime + '"}';
+    var strJSON = '{"isMove":"' + isMove + '","moveType":"' + moveType + '","browserType":"' + browserType + '","browserKernel":"' + browserKernel + '","bVersions":"' + bVersions + '","bLanguage":"' + bLanguage + '","sysLanguage":"' + sysLanguage + '","userLanguage":"' + userLanguage + '","cpuType":"' + cpuType + '","OS":"' + OS + '","size":"' + size + '","isCookie":"' + isCookie + '","plugins":"' + plugins + '","vColor":"' + vColor + '","zone":"' + zone + '","pageUpUrl":"' + pageUpUrl + '","currentName":"' + currentName + '","currentUrl":"' + currentUrl + '","parentUrl":"' + parentUrl + '","currentUrlTitle":"' + currentUrlTitle + '"}';
     var myData = jQuery.parseJSON(strJSON);
 
 
@@ -45,20 +46,16 @@
             //                }
         },
         error: function () {
-            alert("发生错误。");
-        }
+            //alert("发生错误。");
+        }        
     });
 
-
+    //是否移动终端
     function chckeMove() {
         var browser = {
             versions: function () {
                 var u = navigator.userAgent, app = navigator.appVersion;
                 return {         //移动终端浏览器版本信息
-                    trident: u.indexOf('Trident') > -1, //IE内核
-                    presto: u.indexOf('Presto') > -1, //opera内核
-                    webKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
-                    gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1, //火狐内核
                     mobile: !!u.match(/AppleWebKit.*Mobile.*/), //是否为移动终端
                     ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), //ios终端
                     android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1, //android终端或uc浏览器
@@ -66,8 +63,7 @@
                     iPad: u.indexOf('iPad') > -1, //是否iPad
                     webApp: u.indexOf('Safari') == -1 //是否web应该程序，没有头部与底部
                 };
-            } (),
-            language: (navigator.browserLanguage || navigator.language).toLowerCase()
+            } ()
         }
         if (browser.versions.mobile) {
             isMove = "是";
@@ -77,6 +73,26 @@
             else if (browser.versions.iPad) { moveType = "iPad"; }
             else { moveType = "其他"; }
         } else { isMove = "否"; }
+    }
+
+    //获取浏览器内核
+    function getBrowserKernel() {
+        var browser = {
+            versions: function () {
+                var u = navigator.userAgent, app = navigator.appVersion;
+                return {         //移动终端浏览器版本信息
+                    trident: u.indexOf('Trident') > -1, //IE内核
+                    presto: u.indexOf('Presto') > -1, //opera内核
+                    webKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
+                    gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1 //火狐内核
+                };
+            } ()
+        }
+        if (browser.versions.trident) { return "IE内核:Trident"; }
+        if (browser.versions.presto) { return "opera内核:Presto"; }
+        if (browser.versions.webKit) { return "苹果、谷歌内核:AppleWebKit"; }
+        if (browser.versions.gecko) { return "火狐内核:Gecko"; }
+        return "其他";
     }
 
     //获取浏览器类型、版本
@@ -121,16 +137,21 @@
         }
         return "other";
     }
-    //是否支持cookie
+    //是否支持cookie  0:不支持 1:支持
     function CookieEnable() {
-        var result = "不支持";
+        var result = 0;
         if (navigator.cookiesEnabled)
-            return "支持";
-        document.cookie = "testcookie=yes;";
+            return 1;
+
+        document.cookie = "testcookie=yes";
         var cookieSet = document.cookie;
         if (cookieSet.indexOf("testcookie=yes") > -1)
-            result = "支持";
-        document.cookie = "";
+            result = 1;
+
+        var date = new Date();
+        date.setTime(date.getTime() - 10000);
+        document.cookie = "testcookie=yes; expires=" + date.toGMTString();
+
         return result;
     }
 
@@ -143,8 +164,9 @@
             //取得插件的名称
             name = navigator.plugins[i].name;
             //取得插件的文件名称
-            filename = navigator.plugins[i].filename;
-            str += name + "---->" + filename + "<br/>";
+            //filename = navigator.plugins[i].filename;
+            //str += name + "---->" + filename + "<br/>";
+            str += name + " ";
         }
         return str;
     }

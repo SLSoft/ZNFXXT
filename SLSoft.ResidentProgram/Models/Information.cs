@@ -11,9 +11,13 @@ namespace SLSoft.ResidentProgram.Models
         { 
         
         }
+        /// <summary>
+        /// js数据
+        /// </summary>
         public string IsMove { set; get; }//是否移动终端
         public string MoveType { set; get; }//移动终端类型
         public string BrowserType { set; get; }//浏览器类型
+        public string BrowserKernel { set; get; }//浏览器内核
         public string BVersions { set; get; }//浏览器版本
         public string BLanguage { set; get; }//浏览器语言
         public string SysLanguage { set; get; }//系统语言
@@ -28,9 +32,21 @@ namespace SLSoft.ResidentProgram.Models
         public string PageUpUrl { set; get; }//上一页URL
         public string CurrentName { set; get; }//当前域名
         public string CurrentUrl { set; get; }//当前URL
+        public string currentUrlTitle { set; get; }//当前URL标题
         public string ParentUrl { set; get; }//父窗口URL
-        public string ExpTime { set; get; }//cookie过期时间
 
+        /// <summary>
+        /// cookie数据
+        /// </summary>
+        public string SessionCode { set; get; }//cookie过期时间
+        public string SessionType { set; get; }//0:代表新session 1:代表有效session
+        public string ApplicationCode { set; get; }
+        public string LastAccessTime { set; get; }//上一次访问时间
+        public string ApplicationType { set; get; }
+
+        /// <summary>
+        /// 服务器数据
+        /// </summary>
         public string UserHostName { set; get; }//客户端计算机名
         public string UserHostAddress { set; get; }//客户端IP
         public string ServerAddress { set; get; }//服务器端IP
