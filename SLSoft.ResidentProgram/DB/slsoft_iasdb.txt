@@ -1,0 +1,1438 @@
+-- ----------------------------
+-- Procedure structure for `slsoft_ias_bus_p_check_isNewUV`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_check_isNewUV`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `slsoft_ias_bus_p_check_isNewUV`(IN SiteID int, IN IP varchar(256),IN UAMD5 varchar(256))
+select count(1) as isNewUV from slsoft_ias_bus_t_session
+where StatisticsSite_ID=SiteID and ClientIP=IP and UserAgentMD5=UAMD5
+;;
+DELIMITER ;
+
+-- ----------------------------
+-- Procedure structure for `slsoft_ias_bus_p_check_isUV`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_check_isUV`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `slsoft_ias_bus_p_check_isUV`(IN SiteID int, IN IP varchar(256),IN UAMD5 varchar(256))
+select count(1) as isUV from slsoft_ias_bus_t_session
+where StatisticsSite_ID=SiteID and date(createtime)=curdate() and ClientIP=IP and UserAgentMD5=UAMD5
+;;
+DELIMITER ;
+
+-- ----------------------------
+-- Procedure structure for `slsoft_ias_bus_p_insert_accesslist`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_insert_accesslist`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `slsoft_ias_bus_p_insert_accesslist`(IN StatisticsSite_ID int,IN StatisticsSite_Code varchar(512),IN Session_Code varchar(512),IN SourceClass_ID int ,IN SourceClass_Code varchar(512),IN SourcePath varchar(512),IN SourceKey varchar(512),IN LastAccessPage varchar(512),IN LengthOfPage int,IN SessionDepth int,IN TimeZone int,IN IsUV int,IN IsNewUV int,IN LastBrowsingTime datetime,IN NumberOfVisits int,IN NetworkAccessProvider varchar(128),IN Language varchar(32),IN DeviceType varchar(64),IN AboutDevice varchar(64),IN OperationSystem varchar(64),IN Resolution varchar(32),IN Color varchar(32),IN UserAgent varchar(256),IN UserAgentMD5 varchar(256),IN Browser varchar(32),IN BrowserEdition varchar(32),IN BrowserKernel varchar(64),IN IsCookieSupport int,IN IsJavaSupport int,IN IsFrameWebpageSupport int,IN Plugin varchar(1024),IN ClientIP varchar(256),IN Country varchar(64),IN Province varchar(64),IN City varchar(64),IN Area varchar(64),IN ServerIP varchar(256))
+begin
+  Insert into slsoft_ias_bus_t_accesslist(
+	Code,
+	StatisticsSite_ID,
+	StatisticsSite_Code,
+	Session_Code,
+	SourceClass_ID,
+	SourceClass_Code,
+	SourcePath,
+	SourceKey,
+	LastAccessPage,
+	LengthOfPage,
+	SessionDepth,
+	TimeZone,
+	AccessDate,
+	IsUV,
+	IsNewUV,
+	LastBrowsingTime,
+	NumberOfVisits,
+	NetworkAccessProvider,
+	Language,
+	DeviceType,
+	AboutDevice,
+	OperationSystem,
+	Resolution,
+	Color,
+	UserAgent,
+	UserAgentMD5,
+	Browser,
+	BrowserEdition,
+	BrowserKernel,
+	IsCookieSupport,
+	IsJavaSupport,
+	IsFrameWebpageSupport,
+	Plugin,
+	ClientIP,
+	Country,
+	Province,
+	City,
+	Area,
+	ServerIP,
+	CreateTime,
+	IsValid
+	) values(
+	UUID(),
+	StatisticsSite_ID,
+	StatisticsSite_Code,
+	Session_Code,
+	SourceClass_ID,
+	SourceClass_Code,
+	SourcePath,
+	SourceKey,
+	LastAccessPage,
+	LengthOfPage,
+	SessionDepth,
+	TimeZone,
+	now(),
+	IsUV,
+	IsNewUV,
+	LastBrowsingTime,
+	NumberOfVisits,
+	NetworkAccessProvider,
+	Language,
+	DeviceType,
+	AboutDevice,
+	OperationSystem,
+	Resolution,
+	Color,
+	UserAgent,
+	UserAgentMD5,
+	Browser,
+	BrowserEdition,
+	BrowserKernel,
+	IsCookieSupport,
+	IsJavaSupport,
+	IsFrameWebpageSupport,
+	Plugin,
+	ClientIP,
+	Country,
+	Province,
+	City,
+	Area,
+	ServerIP,
+	now(),
+	1);
+end
+;;
+DELIMITER ;
+
+-- ----------------------------
+-- Procedure structure for `slsoft_ias_bus_p_insert_flowanalysis`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_insert_flowanalysis`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `slsoft_ias_bus_p_insert_flowanalysis`(IN StatisticsSite_ID INT,IN StatisticsSite_Code varchar(512),IN TimeZone int,IN PV int,IN UV int,IN IP int,IN NewUV varchar(256),IN Session int,IN ThePerCapitaBrowsingPages int,IN AvgDepthCount varchar(256),IN AvgTimeSpent varchar(256),IN AvgOut varchar(256))
+begin
+  Insert into SLSoft_IAS_Bus_T_FlowAnalysis(
+	Code,StatisticsSite_ID,
+	StatisticsSite_Code,
+	TimeZone,
+	StatisticalDate,
+	Year,
+	Month,
+	Day,
+	Hour,
+	Minute,
+	Second,
+	PV,
+	UV,
+	IP,
+	NewUV,
+	Session,
+	ThePerCapitaBrowsingPages,
+	AvgDepthCount,
+	AvgTimeSpent,
+	AvgOut,
+	CreateTime,
+	IsValid
+	) values(
+	UUID(),
+	StatisticsSite_ID,
+	StatisticsSite_Code,
+	TimeZone,
+	now(),
+	Year(now()),
+	Month(now()),
+	Day(now()),
+	Hour(now()),
+	Minute(now()),
+	Second(now()),
+	PV,
+	UV,
+	IP,
+	NewUV,
+	Session,
+	ThePerCapitaBrowsingPages,
+	AvgDepthCount,
+	AvgTimeSpent,
+	AvgOut,
+	now(),
+	1);
+end
+;;
+DELIMITER ;
+
+-- ----------------------------
+-- Procedure structure for `slsoft_ias_bus_p_insert_session`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_insert_session`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `slsoft_ias_bus_p_insert_session`(IN Code varchar(128),IN UserCode varchar(128),IN StatisticsSite_ID int,IN StatisticsSite_Code varchar(512),IN SourceClass_ID int ,IN SourceClass_Code varchar(512),IN SourcePath varchar(512),IN SourceKey varchar(512),IN LastAccessPage varchar(512),IN LengthOfSession int,IN SessionDepth int,IN TimeZone int,IN IsUV int,IN IsNewUV int,IN LastBrowsingTime datetime,IN NumberOfVisits int,IN NetworkAccessProvider varchar(128),IN Language varchar(32),IN DeviceType varchar(64),IN AboutDevice varchar(64),IN OperationSystem varchar(64),IN Resolution varchar(32),IN Color varchar(32),IN UserAgent varchar(256),IN UserAgentMD5 varchar(256),IN Browser varchar(32),IN BrowserEdition varchar(32),IN BrowserKernel varchar(64),IN IsCookieSupport int,IN IsJavaSupport int,IN IsFrameWebpageSupport int,IN Plugin varchar(1024),IN ClientIP varchar(256),IN Country varchar(64),IN Province varchar(64),IN City varchar(64),IN Area varchar(64),IN ServerIP varchar(256))
+begin
+  Insert into slsoft_ias_bus_t_session(
+	Code,
+	UserCode,
+	StatisticsSite_ID,
+	StatisticsSite_Code,
+	SourceClass_ID,
+	SourceClass_Code,
+	SourcePath,
+	SourceKey,
+	LastAccessPage,
+	LengthOfSession,
+	SessionDepth,
+	TimeZone,
+	AccessDate,
+	IsUV,
+	IsNewUV,
+	LastBrowsingTime,
+	NumberOfVisits,
+	NetworkAccessProvider,
+	Language,
+	DeviceType,
+	AboutDevice,
+	OperationSystem,
+	Resolution,
+	Color,
+	UserAgent,
+	UserAgentMD5,
+	Browser,
+	BrowserEdition,
+	BrowserKernel,
+	IsCookieSupport,
+	IsJavaSupport,
+	IsFrameWebpageSupport,
+	Plugin,
+	ClientIP,
+	Country,
+	Province,
+	City,
+	Area,
+	ServerIP,
+	CreateTime,
+	IsValid
+	) values(
+	Code,
+	UserCode,
+	StatisticsSite_ID,
+	StatisticsSite_Code,
+	SourceClass_ID,
+	SourceClass_Code,
+	SourcePath,
+	SourceKey,
+	LastAccessPage,
+	LengthOfSession,
+	SessionDepth,
+	TimeZone,
+	now(),
+	IsUV,
+	IsNewUV,
+	LastBrowsingTime,
+	NumberOfVisits,
+	NetworkAccessProvider,
+	Language,
+	DeviceType,
+	AboutDevice,
+	OperationSystem,
+	Resolution,
+	Color,
+	UserAgent,
+	UserAgentMD5,
+	Browser,
+	BrowserEdition,
+	BrowserKernel,
+	IsCookieSupport,
+	IsJavaSupport,
+	IsFrameWebpageSupport,
+	Plugin,
+	ClientIP,
+	Country,
+	Province,
+	City,
+	Area,
+	ServerIP,
+	now(),
+	1);
+end
+;;
+DELIMITER ;
+
+-- ----------------------------
+-- Procedure structure for `slsoft_ias_bus_p_select_accesslistBySessionCode`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_select_accesslistBySessionCode`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `slsoft_ias_bus_p_select_accesslistBySessionCode`(IN SessionCode varchar(128))
+begin
+set @VDID=0;
+select @VDID:=@VDID+1 as VDID, AccessDate as OPENTIME,LengthOfPage as LENGTHOFPAGE,LastAccessPage as PAGEURL
+from SLSoft_IAS_Bus_T_AccessList
+where Session_Code = CONVERT(SessionCode USING utf8) COLLATE utf8_unicode_ci
+order by AccessDate;
+end
+;;
+DELIMITER ;
+
+-- ----------------------------
+-- Procedure structure for `slsoft_ias_bus_p_select_flowanalysis`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_select_flowanalysis`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `slsoft_ias_bus_p_select_flowanalysis`(IN SiteID int,IN startDate varchar(64),IN endDate varchar(64))
+begin
+set @outnum = 0;
+select @outnum:= sum(a.num) from
+( select session_code ,count(0) as num from slsoft_ias_bus_t_accesslist
+where StatisticsSite_ID=SiteID and AccessDate between startDate and endDate
+group by session_code having count(0) = 1) as a;
+
+SELECT
+ifnull(sum(SessionDepth),0) as PV,ifnull(sum(isUv=1),0) as UV,count(distinct  ClientIP) as IP,ifnull(sum(IsNewUV=1),0) as NewUV,count(distinct Session_Code) as Session,
+round(ifnull(sum(SessionDepth)/sum(isUv=1),0),2) as ThePerCapitaBrowsingPages,
+round(ifnull(sum(SessionDepth)/count(distinct Session_Code),0),2) as AvgDepthCount,
+round(ifnull(Sum(LengthOfPage)/count(distinct Session_Code),0),2) as AvgTimeSpent,
+round(ifnull(ifnull(@outnum,0)/count(distinct Session_Code),0),2)*100 as AvgOut
+from slsoft_ias_bus_t_accesslist
+where StatisticsSite_ID =SiteID and AccessDate between startDate and endDate;
+end
+;;
+DELIMITER ;
+
+-- ----------------------------
+-- Procedure structure for `slsoft_ias_bus_p_select_flowanalysisByDay`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_select_flowanalysisByDay`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `slsoft_ias_bus_p_select_flowanalysisByDay`(IN StatisticsSite_ID int,IN startDate varchar(64),IN endDate varchar(64))
+select StatisticalDate,sum(PV) as pvnum,sum(UV) as uvnum,sum(IP) as ipnum,sum(NewUV) as newuvnum,sum(Session) as  vnum,
+round(ifnull(sum(PV)/sum(UV),0),2) as avgpage,
+round(ifnull(sum(PV)/sum(`Session`),0),2) as avgdepth,
+round(ifnull(Sum(PageLength)/sum(`Session`),0),2) as avglength,
+round(ifnull(sum(PageOut)/sum(`Session`),0),2)*100 as jumpnum
+ from SLSoft_IAS_Bus_T_FlowAnalysis
+where StatisticsSite_ID = StatisticsSite_ID and StatisticalDate between startDate and endDate
+group by StatisticalDate
+;;
+DELIMITER ;
+
+-- ----------------------------
+-- Procedure structure for `slsoft_ias_bus_p_select_flowanalysisByHour`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_select_flowanalysisByHour`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `slsoft_ias_bus_p_select_flowanalysisByHour`(IN SiteID int,IN startDate varchar(64),IN endDate varchar(64))
+select if(length(a.`hour`) =1,cast(concat('0',a.`hour`,':00-0',a.`hour`,':59') as char),cast(concat(a.`hour`,':00-',a.`hour`,':59') as char))  as `hour`,
+ifnull(PV,0) as pvnum,
+ifnull(UV,0) as uvnum,
+ifnull(IP,0) as ipnum,
+ifnull(NewUv,0) as newuvnum,
+ifnull(`Session`,0) as vnum,
+ifnull(ThePerCapitaBrowsingPages,0) as avgpage,
+ifnull(AvgDepthCount,0) as avgdepth,
+ifnull(AvgTimeSpent,0) as avglength,
+ifnull(AvgOut,0) as jumpnum
+from
+(select `Hour`, sum(PV) as PV,sum(UV) as UV,sum(IP) as IP,sum(NewUV) as NewUV,sum(`Session`) as `Session`,
+round(ifnull(sum(PV)/sum(UV),0),2) as ThePerCapitaBrowsingPages,
+round(ifnull(sum(PV)/sum(`Session`),0),2) as AvgDepthCount,
+round(ifnull(Sum(PageLength)/sum(`Session`),0),2) as AvgTimeSpent,
+round(ifnull(sum(PageOut)/sum(`Session`),0),2)*100 as AvgOut
+ from SLSoft_IAS_Bus_T_FlowAnalysis
+where StatisticsSite_ID = SiteID and StatisticalDate between startDate and endDate
+group by `Hour`) as b
+right  join slsoft_ias_dic_t_hour a
+on a.`hour` = b.`hour`
+;;
+DELIMITER ;
+
+-- ----------------------------
+-- Procedure structure for `slsoft_ias_bus_p_select_session`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_select_session`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `slsoft_ias_bus_p_select_session`(IN siteID int,IN startDate varchar(64),IN endDate varchar(64))
+begin
+set @VID = 0;
+select @VID:=@VID+1 as VID,Code, time(AccessDate) as dTime,SourcePath,LastAccessPage,LengthOfSession,SessionDepth,ClientIP,Province,City,Area,NetworkAccessProvider as ISP,Language,(case when DeviceType=1 then '是移动设备' else '非移动设备' end) as dType,
+OperationSystem as OS,Resolution as size,Browser,BrowserEdition
+from slsoft_ias_bus_t_session
+where StatisticsSite_ID=siteID and AccessDate between startDate and endDate
+order by AccessDate desc;
+end
+;;
+DELIMITER ;
+
+-- ----------------------------
+-- Procedure structure for `slsoft_ias_bus_p_stat_AccessByHostPath`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_stat_AccessByHostPath`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `slsoft_ias_bus_p_stat_AccessByHostPath`(IN SiteID int,IN HostPath varchar(64),IN startDate varchar(64),IN endDate varchar(64))
+SELECT LastAccessPage as path,
+ifnull(sum(SessionDepth),0) as pvnum,
+ifnull(sum(isUv=1),0) as uvnum,
+count(distinct  ClientIP) as ipnum,
+round(ifnull(sum(SessionDepth)/sum(isUv=1),0),2) as avgpage,
+round(ifnull(sum(SessionDepth)/(select count(0) from slsoft_ias_bus_t_accesslist WHERE StatisticsSite_ID =SiteID and CreateTime between startDate and endDate),0),2)*100 as avgpvnum
+from slsoft_ias_bus_t_accesslist
+WHERE StatisticsSite_ID =SiteID and SUBSTRING_INDEX (SUBSTRING_INDEX(LastAccessPage , '/' , 3),'/',-1)=CONVERT(HostPath USING utf8) COLLATE utf8_unicode_ci and CreateTime between startDate and endDate
+GROUP BY path
+ORDER BY pvnum DESC limit 10
+;;
+DELIMITER ;
+
+-- ----------------------------
+-- Procedure structure for `slsoft_ias_bus_p_stat_AccessHost`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_stat_AccessHost`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `slsoft_ias_bus_p_stat_AccessHost`(IN SiteID int,IN startDate varchar(64),IN endDate varchar(64))
+SELECT SUBSTRING_INDEX (SUBSTRING_INDEX(LastAccessPage , '/' , 3),'/',-1)  as path,
+ifnull(sum(SessionDepth),0) as pvnum,
+ifnull(sum(isUv=1),0) as uvnum,
+count(distinct  ClientIP) as ipnum,
+round(ifnull(sum(SessionDepth)/sum(isUv=1),0),2) as avgpage,
+round(ifnull(sum(SessionDepth)/(select count(0) from slsoft_ias_bus_t_accesslist WHERE StatisticsSite_ID =SiteID and CreateTime between startDate and endDate),0)*100,2) as avgpvnum
+from slsoft_ias_bus_t_accesslist
+WHERE StatisticsSite_ID =SiteID and CreateTime between startDate and endDate
+GROUP BY path
+ORDER BY pvnum DESC
+;;
+DELIMITER ;
+
+-- ----------------------------
+-- Procedure structure for `slsoft_ias_bus_p_stat_AccessHostPVByDay`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_stat_AccessHostPVByDay`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `slsoft_ias_bus_p_stat_AccessHostPVByDay`(IN SiteID int,IN startDate varchar(64),IN endDate varchar(64))
+begin
+
+create temporary table  if not exists  temp_pro_path
+(
+	path varchar(512),
+	num int
+);
+ALTER TABLE temp_pro_path CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+
+insert into temp_pro_path
+select f_getHostPath(LastAccessPage) as path,sum(SessionDepth) as num
+from slsoft_ias_bus_t_session 
+where StatisticsSite_ID = SiteID and LastAccessPage <> '' and createtime between startDate and endDate 
+group by path
+order by num desc LIMIT 3;
+
+select * from temp_pro_path;
+
+select a.path,date(b.CreateTime) as time,sum(SessionDepth) as num
+from
+(select * from temp_pro_path) as a
+LEFT JOIN slsoft_ias_bus_t_session as b
+on SUBSTRING_INDEX (SUBSTRING_INDEX(b.LastAccessPage , '/' , 3),'/',-1)=a.path and createtime between startDate and endDate 
+group by path,time;
+
+drop temporary table if exists temp_pro_path;
+end
+;;
+DELIMITER ;
+
+-- ----------------------------
+-- Procedure structure for `slsoft_ias_bus_p_stat_AccessHostPVByHour`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_stat_AccessHostPVByHour`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `slsoft_ias_bus_p_stat_AccessHostPVByHour`(IN SiteID int,IN startDate varchar(64),IN endDate varchar(64))
+begin
+
+create temporary table  if not exists  temp_pro_path
+(
+	path varchar(512),
+	num int
+);
+ALTER TABLE temp_pro_path CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+
+insert into temp_pro_path
+select f_getHostPath(LastAccessPage) as path,sum(SessionDepth) as num
+from slsoft_ias_bus_t_session 
+where StatisticsSite_ID = SiteID and LastAccessPage <> '' and createtime between startDate and endDate 
+group by path
+order by num desc LIMIT 3;
+
+select * from temp_pro_path;
+
+select a.path,hour(b.CreateTime) as time,sum(SessionDepth) as num
+from
+(select * from temp_pro_path) as a
+LEFT JOIN slsoft_ias_bus_t_session as b
+on SUBSTRING_INDEX (SUBSTRING_INDEX(b.LastAccessPage , '/' , 3),'/',-1)=a.path and createtime between startDate and endDate 
+group by path,time;
+
+drop temporary table if exists temp_pro_path;
+end
+;;
+DELIMITER ;
+
+-- ----------------------------
+-- Procedure structure for `slsoft_ias_bus_p_stat_AccessHostUVByDay`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_stat_AccessHostUVByDay`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `slsoft_ias_bus_p_stat_AccessHostUVByDay`(IN SiteID int,IN startDate varchar(64),IN endDate varchar(64))
+begin
+
+create temporary table  if not exists  temp_pro_path
+(
+	path varchar(512),
+	num int
+);
+ALTER TABLE temp_pro_path CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+
+insert into temp_pro_path
+select f_getHostPath(LastAccessPage) as path,sum(IsUV=1) as num
+from slsoft_ias_bus_t_session 
+where StatisticsSite_ID = SiteID and LastAccessPage <> '' and createtime between startDate and endDate 
+group by  path
+order by num desc LIMIT 3;
+
+select * from temp_pro_path;
+
+select a.path,date(b.CreateTime) as time,sum(IsUV=1) as num
+from
+(select * from temp_pro_path) as a
+LEFT JOIN slsoft_ias_bus_t_session as b
+on SUBSTRING_INDEX (SUBSTRING_INDEX(b.LastAccessPage , '/' , 3),'/',-1)=a.path and createtime between startDate and endDate 
+group by path,time;
+
+drop temporary table if exists temp_pro_path;
+end
+;;
+DELIMITER ;
+
+-- ----------------------------
+-- Procedure structure for `slsoft_ias_bus_p_stat_AccessHostUVByHour`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_stat_AccessHostUVByHour`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `slsoft_ias_bus_p_stat_AccessHostUVByHour`(IN SiteID int,IN startDate varchar(64),IN endDate varchar(64))
+begin
+
+create temporary table  if not exists  temp_pro_path
+(
+	path varchar(512),
+	num int
+);
+ALTER TABLE temp_pro_path CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+
+insert into temp_pro_path
+select f_getHostPath(LastAccessPage) as path,sum(IsUV=1) as num
+from slsoft_ias_bus_t_session 
+where StatisticsSite_ID = SiteID and LastAccessPage <> '' and createtime between startDate and endDate 
+group by  path
+order by num desc LIMIT 3;
+
+select * from temp_pro_path;
+
+select a.path,hour(b.CreateTime) as time,sum(IsUV=1) as num
+from
+(select * from temp_pro_path) as a
+LEFT JOIN slsoft_ias_bus_t_session as b
+on SUBSTRING_INDEX (SUBSTRING_INDEX(b.LastAccessPage , '/' , 3),'/',-1)=a.path and createtime between startDate and endDate 
+group by path,time;
+
+drop temporary table if exists temp_pro_path;
+end
+;;
+DELIMITER ;
+
+-- ----------------------------
+-- Procedure structure for `slsoft_ias_bus_p_stat_AccessPath`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_stat_AccessPath`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `slsoft_ias_bus_p_stat_AccessPath`(IN SiteID int,IN startDate varchar(64),IN endDate varchar(64))
+begin
+create temporary table  if not exists  temp_pro_path
+(
+	path varchar(512),
+	pvnum int,
+	uvnum int,
+	ipnum int,
+	avgpage float,
+  avglength float
+);
+ALTER TABLE temp_pro_path CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+
+insert into temp_pro_path
+SELECT LastAccessPage as path,
+	ifnull(sum(SessionDepth),0) as pvnum,
+	ifnull(sum(isUv=1),0) as uvnum,
+	count(distinct  ClientIP) as ipnum,
+	round(ifnull(sum(SessionDepth)/sum(isUv=1),0),2) as avgpage,
+	round(ifnull(Sum(LengthOfPage)/count(distinct Session_Code),0),2) as avglength
+	from slsoft_ias_bus_t_accesslist
+	WHERE StatisticsSite_ID =SiteID and CreateTime between startDate and endDate
+	GROUP BY path
+	ORDER BY pvnum DESC LIMIT 30;
+
+SELECT a.*,count(b.`Code`) as outpvnum
+from temp_pro_path as a
+left join slsoft_ias_bus_t_accesslist as b
+on a.path=b.SourcePath and b.StatisticsSite_ID =SiteID and b.CreateTime between startDate and endDate
+group by a.path
+order by a.pvnum desc;
+
+drop temporary table if exists temp_pro_path;
+end
+;;
+DELIMITER ;
+
+-- ----------------------------
+-- Procedure structure for `slsoft_ias_bus_p_stat_change`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_stat_change`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `slsoft_ias_bus_p_stat_change`(IN SiteID int,IN IntervalTime int)
+select CONCAT(`Hour`,':',IF(LENGTH(`Minute`)=1,CONCAT('0',`Minute`),`Minute`)) AS time, sum(PV) as PV,sum(UV) as UV,sum(IP) as IP
+from SLSoft_IAS_Bus_T_FlowAnalysis
+where StatisticsSite_ID = SiteID and createtime between  DATE_SUB(NOW(),INTERVAL IntervalTime  MINUTE)  and  now()
+group by Minute(createtime)
+ORDER BY CreateTime
+;;
+DELIMITER ;
+
+-- ----------------------------
+-- Procedure structure for `slsoft_ias_bus_p_stat_ContrastByDay`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_stat_ContrastByDay`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `slsoft_ias_bus_p_stat_ContrastByDay`(IN SiteID int,IN startDate varchar(64),IN endDate varchar(64))
+select CAST(RIGHT(StatisticalDate,5) as CHAR) as `date`,
+ifnull(sum(PV),0) as pvnum,ifnull(sum(UV),0) as uvnum,ifnull(sum(IP),0) as ipnum,ifnull(sum(NewUV),0) as newuvnum,ifnull(sum(Session),0) as vnum,
+round(ifnull(sum(PV)/sum(UV),0),2) as avgpage,
+round(ifnull(sum(PV)/sum(`Session`),0),2) as avgdepth,
+round(ifnull(Sum(PageLength)/sum(`Session`),0),2) as avglength,
+round(ifnull(sum(PageOut)/sum(`Session`),0),2)*100 as jumpnum
+from SLSoft_IAS_Bus_T_FlowAnalysis
+where StatisticsSite_ID = SiteID and StatisticalDate between startDate and endDate
+group by StatisticalDate
+;;
+DELIMITER ;
+
+-- ----------------------------
+-- Procedure structure for `slsoft_ias_bus_p_stat_maxUV`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_stat_maxUV`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `slsoft_ias_bus_p_stat_maxUV`(IN SiteID int)
+select uv as highNum,concat(`Hour`,':',`Minute`) as time,
+(select IFNULL(sum(uv),0) from slsoft_ias_bus_t_flowanalysis where StatisticsSite_ID = SiteID and createtime between  DATE_SUB(NOW(),INTERVAL 1  MINUTE)  and  now()) as CNum 
+from slsoft_ias_bus_t_flowanalysis 
+where StatisticsSite_ID =SiteID and StatisticalDate = CURDATE() 
+order by uv desc limit 1
+;;
+DELIMITER ;
+
+-- ----------------------------
+-- Procedure structure for `slsoft_ias_bus_p_stat_newUV`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_stat_newUV`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `slsoft_ias_bus_p_stat_newUV`(IN SiteID int,IN IntervalTime int)
+select IFNULL(sum(NewUv),0) as NewUV,IFNULL(sum(UV),0)-IFNULL(SUM(NewUV),0) as UV
+from slsoft_ias_bus_t_flowanalysis
+where StatisticsSite_ID = SiteID and createtime between  DATE_SUB(NOW(),INTERVAL IntervalTime MINUTE)  and  now()
+;;
+DELIMITER ;
+
+-- ----------------------------
+-- Procedure structure for `slsoft_ias_bus_p_stat_pcDeviceType`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_stat_pcDeviceType`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `slsoft_ias_bus_p_stat_pcDeviceType`(IN SiteID int,IN startDate varchar(64),IN endDate varchar(64))
+select DeviceType as id, 
+( case when  DeviceType=1 then '移动设备'  else '非移动设备' end) as dname,
+ifnull(sum(SessionDepth),0) as pvnum,ifnull(sum(isUv=1),0) as uvnum,count(distinct  ClientIP) as ipnum,ifnull(sum(IsNewUV=1),0) as newuvnum,count(SourceClass_ID) as vnum,count(DISTINCT SourceKey) as keynum,
+round(ifnull(sum(SessionDepth)/sum(isUv=1),0),2) as avgpage,
+round(ifnull(sum(SessionDepth)/count(CODE),0),2) as avgdepth,
+round(ifnull(Sum(LengthOfSession)/count(CODE),0),2) as avglength,
+round(ifnull(sum(SessionDepth=1)/count(CODE),0),2)*100 as jumpnum
+from slsoft_ias_bus_t_session
+where StatisticsSite_ID = SiteID and createtime between startDate and endDate
+group by DeviceType
+order by pvnum desc
+;;
+DELIMITER ;
+
+-- ----------------------------
+-- Procedure structure for `slsoft_ias_bus_p_stat_pcDeviceTypeIndex`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_stat_pcDeviceTypeIndex`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `slsoft_ias_bus_p_stat_pcDeviceTypeIndex`(IN SiteID int,IN startDate varchar(64),IN endDate varchar(64),IN oType int)
+select ( case when  DeviceType=1 then '移动设备'  else '非移动设备' end) as dname,
+cast(ELT(oType,sum(SessionDepth), sum(IsUV=1),count(distinct  ClientIP),sum(IsNewUV=1),count(code)) as char)  as num
+from slsoft_ias_bus_t_session
+where StatisticsSite_ID =SiteID and CreateTime between startDate and endDate
+group by DeviceType
+;;
+DELIMITER ;
+
+-- ----------------------------
+-- Procedure structure for `slsoft_ias_bus_p_stat_Province`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_stat_Province`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `slsoft_ias_bus_p_stat_Province`(IN SiteID int,IN startDate varchar(64),IN endDate varchar(64))
+begin
+create temporary table  if not exists  temp_pro_jump
+(
+	pname varchar(512),
+	num int
+);
+ALTER TABLE temp_pro_jump CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+
+insert into temp_pro_jump
+select a.Province as pname,sum(a.num) as num from
+	( select Province,session_code ,count(0) as num from slsoft_ias_bus_t_accesslist where StatisticsSite_ID = SiteID and createtime between startDate and endDate group by session_code having count(0) = 1) as a
+group by Province;
+
+select a.PID,a.PName,ifnull(t.pvnum,0) as pvnum,ifnull(t.uvnum,0) as uvnum,ifnull(t.ipnum,0) as ipnum,ifnull(t.newuvnum,0) as newuvnum,ifnull(t.vnum,0) as vnum,
+ifnull(t.avgpage,0) as avgpage,ifnull(t.avgdepth,0) as avgdepth,ifnull(t.avglength,0) as avglength,ifnull(t.jumpnum,0) as jumpnum
+from
+(
+select Province,
+ifnull(sum(SessionDepth),0) as pvnum,ifnull(sum(isUv=1),0) as uvnum,count(distinct  ClientIP) as ipnum,ifnull(sum(IsNewUV=1),0) as newuvnum,count(distinct Session_Code) as vnum,
+round(ifnull(sum(SessionDepth)/sum(isUv=1),0),2) as avgpage,
+round(ifnull(sum(SessionDepth)/count(distinct Session_Code),0),2) as avgdepth,
+round(ifnull(Sum(LengthOfPage)/count(distinct Session_Code),0),2) as avglength,
+round(ifnull((select num from temp_pro_jump where pname=Province)/count(distinct Session_Code),0),2)*100 as jumpnum
+from slsoft_ias_bus_t_accesslist
+where StatisticsSite_ID = SiteID and createtime between startDate and endDate
+group by Province
+order by Province desc
+) as t
+right join slsoft_ias_dic_t_area as a
+on t.Province = a.PName;
+
+drop temporary table if exists temp_pro_jump;
+end
+;;
+DELIMITER ;
+
+-- ----------------------------
+-- Procedure structure for `slsoft_ias_bus_p_stat_PV`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_stat_PV`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `slsoft_ias_bus_p_stat_PV`(IN SiteID int,IN IntervalTime int)
+select IFNULL(SUM(PV),0) as PV,IFNULL(SUM(UV),0) as UV,IFNULL(SUM(IP),0) as IP
+from slsoft_ias_bus_t_flowanalysis
+where StatisticsSite_ID = SiteID and createtime between  DATE_SUB(NOW(),INTERVAL IntervalTime MINUTE)  and  now()
+;;
+DELIMITER ;
+
+-- ----------------------------
+-- Procedure structure for `slsoft_ias_bus_p_stat_service`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_stat_service`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `slsoft_ias_bus_p_stat_service`(IN SiteID int,IN startDate varchar(64),IN endDate varchar(64))
+begin
+create temporary table  if not exists  temp_ser_jump
+(
+	pname varchar(512),
+	num int
+);
+ALTER TABLE temp_ser_jump CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+
+insert into temp_ser_jump
+select a.Service as pname,sum(a.num) as num from
+	( select ( case when  NetworkAccessProvider='' then '其它' else NetworkAccessProvider end) as Service,session_code ,count(0) as num from slsoft_ias_bus_t_accesslist where StatisticsSite_ID = SiteID and createtime between startDate and endDate group by session_code having count(0) = 1) as a
+group by pname;
+
+select ( case when  NetworkAccessProvider='' then '其它' else NetworkAccessProvider end) as Service,
+ifnull(sum(SessionDepth),0) as pvnum,ifnull(sum(isUv=1),0) as uvnum,count(distinct  ClientIP) as ipnum,ifnull(sum(IsNewUV=1),0) as newuvnum,count(distinct Session_Code) as vnum,
+round(ifnull(sum(SessionDepth)/sum(isUv=1),0),2) as avgpage,
+round(ifnull(sum(SessionDepth)/count(distinct Session_Code),0),2) as avgdepth,
+round(ifnull(Sum(LengthOfPage)/count(distinct Session_Code),0),2) as avglength,
+round(ifnull((select num from temp_ser_jump where pname=NetworkAccessProvider)/count(distinct Session_Code),0),2)*100 as jumpnum
+from slsoft_ias_bus_t_accesslist
+where StatisticsSite_ID = SiteID and createtime between startDate and endDate
+group by NetworkAccessProvider
+order by NetworkAccessProvider desc;
+
+drop temporary table if exists temp_ser_jump;
+end
+;;
+DELIMITER ;
+
+-- ----------------------------
+-- Procedure structure for `slsoft_ias_bus_p_stat_source`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_stat_source`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `slsoft_ias_bus_p_stat_source`(IN SiteID int,IN startDate varchar(64),IN endDate varchar(64))
+select SourceClass_ID as sid, 
+( case when  SourceClass_ID=1 then '直接输入网址或书签'  when SourceClass_ID=2 then '搜索引擎' when SourceClass_ID=3 then '内部链接'  when SourceClass_ID=4 then '外部链接'  else '其它' end) as sname,
+ifnull(sum(SessionDepth),0) as pvnum,ifnull(sum(isUv=1),0) as uvnum,count(distinct  ClientIP) as ipnum,ifnull(sum(IsNewUV=1),0) as newuvnum,count(SourceClass_ID) as vnum,count(DISTINCT SourceKey) as keynum,
+round(ifnull(sum(SessionDepth)/sum(isUv=1),0),2) as avgpage,
+round(ifnull(sum(SessionDepth)/count(CODE),0),2) as avgdepth,
+round(ifnull(Sum(LengthOfSession)/count(CODE),0),2) as avglength,
+round(ifnull(sum(SessionDepth=1)/count(CODE),0),2)*100 as jumpnum
+from slsoft_ias_bus_t_session
+where StatisticsSite_ID = SiteID and createtime between startDate and endDate
+group by SourceClass_ID
+order by SourceClass_ID
+;;
+DELIMITER ;
+
+-- ----------------------------
+-- Procedure structure for `slsoft_ias_bus_p_stat_sourceByCode`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_stat_sourceByCode`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `slsoft_ias_bus_p_stat_sourceByCode`(IN SourceCode varchar(64),IN startDate varchar(64),IN endDate varchar(64))
+select SourceKey as skey,count(SourceClass_Code) as snum
+from slsoft_ias_bus_t_session
+where SourceClass_ID=2 and SourceClass_Code=CONVERT(SourceCode USING utf8) COLLATE utf8_unicode_ci and CreateTime BETWEEN startDate AND endDate
+group by SourceKey
+order by snum desc
+;;
+DELIMITER ;
+
+-- ----------------------------
+-- Procedure structure for `slsoft_ias_bus_p_stat_sourceByDay`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_stat_sourceByDay`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `slsoft_ias_bus_p_stat_sourceByDay`(IN SiteID int,IN startDate varchar(64),IN endDate varchar(64),IN oType int)
+select SourceClass_ID as sourceId, date(CreateTime) as time,  
+cast(ELT(oType,sum(SessionDepth), sum(IsUV=1),count(distinct  ClientIP),sum(IsNewUV=1),count(SourceClass_ID)) as char)  as num
+from slsoft_ias_bus_t_session
+where StatisticsSite_ID =SiteID and CreateTime between startDate and endDate
+group by SourceClass_ID,date(CreateTime)
+;;
+DELIMITER ;
+
+-- ----------------------------
+-- Procedure structure for `slsoft_ias_bus_p_stat_sourceByHostPath`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_stat_sourceByHostPath`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `slsoft_ias_bus_p_stat_sourceByHostPath`(IN HostPath varchar(128),IN startDate varchar(64),IN endDate varchar(64))
+select  SourcePath as path,
+count(SourcePath) as count,
+ifnull(sum(SessionDepth),0) as pvnum,
+ifnull(sum(isUv=1),0) as uvnum,
+count(distinct  ClientIP) as ipnum,
+ifnull(sum(IsNewUV=1),0) as newuvnum,
+round(ifnull(sum(SessionDepth)/sum(isUv=1),0),2) as avgpage,
+round(ifnull(sum(SessionDepth)/count(CODE),0),2) as avgdepth,
+round(ifnull(Sum(LengthOfSession)/count(CODE),0),2) as avglength,
+round(ifnull(Sum(SessionDepth=1)/count(CODE),0),2)*100 as jumpnum
+from slsoft_ias_bus_t_session 
+where SUBSTRING_INDEX (SUBSTRING_INDEX(SourcePath , '/' , 3),'/',-1) = CONVERT(HostPath  USING utf8) COLLATE utf8_unicode_ci and CreateTime BETWEEN startDate AND endDate
+group by path
+order by count desc
+;;
+DELIMITER ;
+
+-- ----------------------------
+-- Procedure structure for `slsoft_ias_bus_p_stat_sourceByHour`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_stat_sourceByHour`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `slsoft_ias_bus_p_stat_sourceByHour`(IN SiteID int,IN startDate varchar(64),IN endDate varchar(64),IN oType int)
+select SourceClass_ID as sourceId, hour(CreateTime) as time,  
+cast(ELT(oType,sum(SessionDepth), sum(IsUV=1),count(distinct  ClientIP),sum(IsNewUV=1),count(SourceClass_ID)) as char)  as num
+from slsoft_ias_bus_t_session
+where StatisticsSite_ID =SiteID and CreateTime between startDate and endDate
+group by SourceClass_ID,hour(CreateTime)
+;;
+DELIMITER ;
+
+-- ----------------------------
+-- Procedure structure for `slsoft_ias_bus_p_stat_sourceCode`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_stat_sourceCode`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `slsoft_ias_bus_p_stat_sourceCode`(IN SiteID int,IN startDate varchar(64),IN endDate varchar(64))
+select SourceClass_Code as scode,
+ifnull(sum(SessionDepth),0) as pvnum,ifnull(sum(isUv=1),0) as uvnum,count(distinct  ClientIP) as ipnum,ifnull(sum(IsNewUV=1),0) as newuvnum,
+count(SourceClass_Code) as vnum,
+count(distinct SourceKey) as keynum,
+round(ifnull(sum(SessionDepth)/sum(isUv=1),0),2) as avgpage,
+round(ifnull(sum(SessionDepth)/count(Code),0),2) as avgdepth,
+round(ifnull(Sum(LengthOfSession)/count(Code),0),2) as avglength,
+round(ifnull(Sum(SessionDepth=1)/count(Code),0),2)*100 as jumpnum
+from slsoft_ias_bus_t_session
+where StatisticsSite_ID = SiteID and SourceClass_ID=2 and createtime between startDate and endDate
+group by SourceClass_Code
+order by vnum desc
+;;
+DELIMITER ;
+
+-- ----------------------------
+-- Procedure structure for `slsoft_ias_bus_p_stat_sourceCodeByDay`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_stat_sourceCodeByDay`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `slsoft_ias_bus_p_stat_sourceCodeByDay`(IN SiteID int,IN startDate varchar(64),IN endDate varchar(64),IN oType int)
+select SourceClass_Code as scode, date(CreateTime) as time,  
+cast(ELT(oType,sum(SessionDepth), sum(IsUV=1),count(distinct  ClientIP),sum(IsNewUV=1),count(SourceClass_Code)) as char)  as num
+from slsoft_ias_bus_t_session
+where StatisticsSite_ID =SiteID and SourceClass_Id = 2 and CreateTime between startDate and endDate
+group by SourceClass_Code,date(CreateTime)
+;;
+DELIMITER ;
+
+-- ----------------------------
+-- Procedure structure for `slsoft_ias_bus_p_stat_sourceCodeByHour`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_stat_sourceCodeByHour`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `slsoft_ias_bus_p_stat_sourceCodeByHour`(IN SiteID int,IN startDate varchar(64),IN endDate varchar(64),IN oType int)
+select SourceClass_Code as scode, hour(CreateTime) as time,  
+cast(ELT(oType,sum(SessionDepth), sum(IsUV=1),count(distinct  ClientIP),sum(IsNewUV=1),count(SourceClass_Code)) as char)  as num
+from slsoft_ias_bus_t_session
+where StatisticsSite_ID =SiteID and SourceClass_Id=2 and CreateTime between startDate and endDate
+group by SourceClass_Code,hour(CreateTime)
+;;
+DELIMITER ;
+
+-- ----------------------------
+-- Procedure structure for `slsoft_ias_bus_p_stat_SourceHostCountByDay`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_stat_SourceHostCountByDay`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `slsoft_ias_bus_p_stat_SourceHostCountByDay`(IN SiteID int,IN startDate varchar(64),IN endDate varchar(64))
+begin
+
+create temporary table  if not exists  temp_pro_path
+(
+	path varchar(512),
+	count int
+);
+ALTER TABLE temp_pro_path CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+
+insert into temp_pro_path
+select f_getHostPath(SourcePath) as path,count(f_getHostPath(SourcePath)) as count
+from slsoft_ias_bus_t_session 
+where StatisticsSite_ID = SiteID and SourcePath <> '' and createtime between startDate and endDate 
+group by  path
+order by count desc LIMIT 3;
+
+select * from temp_pro_path;
+
+select a.path,date(b.CreateTime) as time,count(f_getHostPath(SourcePath)) as num
+from
+(select * from temp_pro_path) as a
+LEFT JOIN slsoft_ias_bus_t_session as b
+on SUBSTRING_INDEX (SUBSTRING_INDEX(b.SourcePath , '/' , 3),'/',-1)=a.path and createtime between startDate and endDate 
+group by path,time;
+
+drop temporary table if exists temp_pro_path;
+end
+;;
+DELIMITER ;
+
+-- ----------------------------
+-- Procedure structure for `slsoft_ias_bus_p_stat_SourceHostCountByHour`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_stat_SourceHostCountByHour`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `slsoft_ias_bus_p_stat_SourceHostCountByHour`(IN SiteID int,IN startDate varchar(64),IN endDate varchar(64))
+begin
+
+create temporary table  if not exists  temp_pro_path
+(
+	path varchar(512),
+	count int
+);
+ALTER TABLE temp_pro_path CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+
+insert into temp_pro_path
+select f_getHostPath(SourcePath) as path,count(f_getHostPath(SourcePath)) as count
+from slsoft_ias_bus_t_session 
+where StatisticsSite_ID = SiteID and SourcePath <> '' and createtime between startDate and endDate 
+group by  path
+order by count desc LIMIT 3;
+
+select * from temp_pro_path;
+
+select a.path,hour(b.CreateTime) as time,count(f_getHostPath(SourcePath)) as num
+from
+(select * from temp_pro_path) as a
+LEFT JOIN slsoft_ias_bus_t_session as b
+on SUBSTRING_INDEX (SUBSTRING_INDEX(b.SourcePath , '/' , 3),'/',-1)=a.path and date(CreateTime) =CURDATE()
+group by path,time;
+
+drop temporary table if exists temp_pro_path;
+end
+;;
+DELIMITER ;
+
+-- ----------------------------
+-- Procedure structure for `slsoft_ias_bus_p_stat_sourceHostPath`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_stat_sourceHostPath`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `slsoft_ias_bus_p_stat_sourceHostPath`(IN SiteID int,IN startDate varchar(64),IN endDate varchar(64),IN oType int)
+select  ELT(oType,SUBSTRING_INDEX (SUBSTRING_INDEX(SourcePath , '/' , 3),'/',-1),SourcePath) as path,
+count(ELT(oType,SUBSTRING_INDEX (SUBSTRING_INDEX(SourcePath , '/' , 3),'/',-1),SourcePath)) as count,
+ifnull(sum(SessionDepth),0) as pvnum,
+ifnull(sum(isUv=1),0) as uvnum,
+count(distinct  ClientIP) as ipnum,
+ifnull(sum(IsNewUV=1),0) as newuvnum,
+round(ifnull(sum(SessionDepth)/sum(isUv=1),0),2) as avgpage,
+round(ifnull(sum(SessionDepth)/count(CODE),0),2) as avgdepth,
+round(ifnull(Sum(LengthOfSession)/count(CODE),0),2) as avglength,
+round(ifnull(Sum(SessionDepth=1)/count(CODE),0),2)*100 as jumpnum
+from slsoft_ias_bus_t_session where StatisticsSite_ID = SiteID and SourcePath <> '' and createtime between startDate and endDate 
+group by path
+order by count desc
+;;
+DELIMITER ;
+
+-- ----------------------------
+-- Procedure structure for `slsoft_ias_bus_p_stat_SourceHostPVByDay`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_stat_SourceHostPVByDay`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `slsoft_ias_bus_p_stat_SourceHostPVByDay`(IN SiteID int,IN startDate varchar(64),IN endDate varchar(64))
+begin
+
+create temporary table  if not exists  temp_pro_path
+(
+	path varchar(512),
+	num int
+);
+ALTER TABLE temp_pro_path CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+
+insert into temp_pro_path
+select f_getHostPath(SourcePath) as path,sum(SessionDepth) as num
+from slsoft_ias_bus_t_session 
+where StatisticsSite_ID = SiteID and SourcePath <> '' and createtime between startDate and endDate 
+group by path
+order by num desc LIMIT 3;
+
+select * from temp_pro_path;
+
+select a.path,date(b.CreateTime) as time,sum(SessionDepth) as num
+from
+(select * from temp_pro_path) as a
+LEFT JOIN slsoft_ias_bus_t_session as b
+on SUBSTRING_INDEX (SUBSTRING_INDEX(b.SourcePath , '/' , 3),'/',-1)=a.path and createtime between startDate and endDate 
+group by path,time;
+
+drop temporary table if exists temp_pro_path;
+end
+;;
+DELIMITER ;
+
+-- ----------------------------
+-- Procedure structure for `slsoft_ias_bus_p_stat_SourceHostPVByHour`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_stat_SourceHostPVByHour`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `slsoft_ias_bus_p_stat_SourceHostPVByHour`(IN SiteID int,IN startDate varchar(64),IN endDate varchar(64))
+begin
+
+create temporary table  if not exists  temp_pro_path
+(
+	path varchar(512),
+	num int
+);
+ALTER TABLE temp_pro_path CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+
+insert into temp_pro_path
+select f_getHostPath(SourcePath) as path,sum(SessionDepth) as num
+from slsoft_ias_bus_t_session 
+where StatisticsSite_ID = SiteID and SourcePath <> '' and createtime between startDate and endDate 
+group by path
+order by num desc LIMIT 3;
+
+select * from temp_pro_path;
+
+select a.path,hour(b.CreateTime) as time,sum(SessionDepth) as num
+from
+(select * from temp_pro_path) as a
+LEFT JOIN slsoft_ias_bus_t_session as b
+on SUBSTRING_INDEX (SUBSTRING_INDEX(b.SourcePath , '/' , 3),'/',-1)=a.path and date(CreateTime) =CURDATE()
+group by path,time;
+
+drop temporary table if exists temp_pro_path;
+end
+;;
+DELIMITER ;
+
+-- ----------------------------
+-- Procedure structure for `slsoft_ias_bus_p_stat_sourceKey`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_stat_sourceKey`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `slsoft_ias_bus_p_stat_sourceKey`(IN SiteID int,IN startDate varchar(64),IN endDate varchar(64))
+select SourceKey as skey,
+ifnull(sum(SessionDepth),0) as pvnum,ifnull(sum(isUv=1),0) as uvnum,count(distinct  ClientIP) as ipnum,ifnull(sum(IsNewUV=1),0) as newuvnum,
+count(SourceKey) as vnum,
+round(ifnull(sum(SessionDepth)/sum(isUv=1),0),2) as avgpage,
+round(ifnull(sum(SessionDepth)/count(Code),0),2) as avgdepth,
+round(ifnull(Sum(LengthOfSession)/count(Code),0),2) as avglength,
+round(ifnull(Sum(SessionDepth=1)/count(Code),0),2)*100 as jumpnum
+from slsoft_ias_bus_t_session
+where StatisticsSite_ID = SiteID and SourceClass_ID=2 and SourceKey <> '' and createtime between startDate and endDate
+group by SourceKey
+order by vnum desc
+;;
+DELIMITER ;
+
+-- ----------------------------
+-- Procedure structure for `slsoft_ias_bus_p_stat_timing`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_stat_timing`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `slsoft_ias_bus_p_stat_timing`()
+begin
+set @time = '';
+set @starttime = '';
+set @endtime = '';
+select @time:=concat(date(now()),' ',HOUR(now()),':',MINUTE(now()));
+select @starttime:= concat(@time,':00');
+select @endtime:=concat(@time,':59');
+
+set @outnum = 0;
+select @outnum:= sum(a.num) from
+( select session_code ,count(0) as num from slsoft_ias_bus_t_accesslist
+where StatisticsSite_ID=1 and AccessDate between @starttime and @endtime
+group by session_code having count(0) = 1) as a;
+
+  Insert into SLSoft_IAS_Bus_T_FlowAnalysis(
+	Code,StatisticsSite_ID,
+	StatisticsSite_Code,
+	TimeZone,
+	StatisticalDate,
+	Year,
+	Month,
+	Day,
+	Hour,
+	Minute,
+	Second,
+	PV,
+	UV,
+	IP,
+	NewUV,
+	Session,
+	PageLength,
+	PageOut,
+	ThePerCapitaBrowsingPages,
+	AvgDepthCount,
+	AvgTimeSpent,
+	AvgOut,
+	CreateTime,
+	IsValid
+	)
+select UUID() as Code, 1 as StatisticsSite_ID,'' as StatisticsSite_Code,8 as TimeZone,now() as StatisticalDate,Year(now()) as Year,Month(now()) as Month,Day(now()) as Day,HOUR(NOW()) as Hour,MINUTE(NOW()) as Minute,SECOND(NOW()) as Second,
+ifnull(sum(SessionDepth),0) as PV,ifnull(sum(isUv=1),0) as UV,count(distinct  ClientIP) as IP,ifnull(sum(IsNewUV=1),0) as NewUV,count(distinct Session_Code) as Session,
+ifnull(sum(LengthOfPage),0) as PageLength,
+ifnull(@outnum,0) as PageOut,
+round(ifnull(sum(SessionDepth)/sum(isUv=1),0),2) as ThePerCapitaBrowsingPages,
+round(ifnull(sum(SessionDepth)/count(distinct Session_Code),0),2) as AvgDepthCount,
+round(ifnull(Sum(LengthOfPage)/count(distinct Session_Code),0),2) as AvgTimeSpent,
+round(ifnull(ifnull(@outnum,0)/count(distinct Session_Code),0),2)*100 as AvgOut,
+@endtime as CreateTime,1 as IsValid
+from slsoft_ias_bus_t_accesslist
+where StatisticsSite_ID =1 and AccessDate between @starttime and @endtime;
+end
+;;
+DELIMITER ;
+
+-- ----------------------------
+-- Procedure structure for `slsoft_ias_bus_p_stat_userView`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_stat_userView`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `slsoft_ias_bus_p_stat_userView`(IN SiteID int,IN Path varchar(512),IN Date varchar(64))
+select IFNULL(SUM(SessionDepth),0) as PV,IFNULL(SUM(IsUV=1),0) as UV,
+ROUND(ifnull(SUM(SessionDepth)/(select SUM(SessionDepth) from slsoft_ias_bus_t_accesslist where StatisticsSite_ID = SiteID and date(CreateTime)=Date),0),3) as avgPV
+from slsoft_ias_bus_t_accesslist
+where StatisticsSite_ID = SiteID  and LastAccessPage=CONVERT(Path USING utf8) COLLATE utf8_unicode_ci and date(CreateTime)=Date
+;;
+DELIMITER ;
+
+-- ----------------------------
+-- Procedure structure for `slsoft_ias_bus_p_stat_userView1`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_stat_userView1`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `slsoft_ias_bus_p_stat_userView1`(IN SiteID int,IN Path varchar(128),IN Date varchar(64))
+SELECT count(1) as num
+from slsoft_ias_bus_t_accesslist
+WHERE StatisticsSite_ID =SiteID  and  LastAccessPage=CONVERT(Path USING utf8) COLLATE utf8_unicode_ci and date(CreateTime)=Date
+;;
+DELIMITER ;
+
+-- ----------------------------
+-- Procedure structure for `slsoft_ias_bus_p_stat_userView2`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_stat_userView2`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `slsoft_ias_bus_p_stat_userView2`(IN SiteID int,IN Date varchar(64))
+SELECT LastAccessPage as path,ifnull(sum(SessionDepth),0) as pvnum,ifnull(sum(isUv=1),0) as uvnum
+from slsoft_ias_bus_t_accesslist
+WHERE StatisticsSite_ID =SiteID and date(CreateTime)=Date
+GROUP BY path
+ORDER BY pvnum DESC
+;;
+DELIMITER ;
+
+-- ----------------------------
+-- Procedure structure for `slsoft_ias_bus_p_timing_siteid_10`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_timing_siteid_10`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `slsoft_ias_bus_p_timing_siteid_10`()
+begin
+set @time = '';
+set @starttime = '';
+set @endtime = '';
+select @time:=concat(date(now()),' ',HOUR(now()),':',MINUTE(now()));
+select @starttime:= concat(@time,':00');
+select @endtime:=concat(@time,':59');
+
+set @outnum = 0;
+select @outnum:= sum(a.num) from
+( select session_code ,count(0) as num from slsoft_ias_bus_t_accesslist
+where StatisticsSite_ID=10 and AccessDate between @starttime and @endtime
+group by session_code having count(0) = 1) as a;
+
+  Insert into SLSoft_IAS_Bus_T_FlowAnalysis(
+	Code,StatisticsSite_ID,
+	StatisticsSite_Code,
+	TimeZone,
+	StatisticalDate,
+	Year,
+	Month,
+	Day,
+	Hour,
+	Minute,
+	Second,
+	PV,
+	UV,
+	IP,
+	NewUV,
+	Session,
+	PageLength,
+	PageOut,
+	ThePerCapitaBrowsingPages,
+	AvgDepthCount,
+	AvgTimeSpent,
+	AvgOut,
+	CreateTime,
+	IsValid
+	)
+select UUID() as Code, 10 as StatisticsSite_ID,'' as StatisticsSite_Code,8 as TimeZone,now() as StatisticalDate,Year(now()) as Year,Month(now()) as Month,Day(now()) as Day,HOUR(NOW()) as Hour,MINUTE(NOW()) as Minute,SECOND(NOW()) as Second,
+ifnull(sum(SessionDepth),0) as PV,ifnull(sum(isUv=1),0) as UV,count(distinct  ClientIP) as IP,ifnull(sum(IsNewUV=1),0) as NewUV,count(distinct Session_Code) as Session,
+ifnull(sum(LengthOfPage),0) as PageLength,
+ifnull(@outnum,0) as PageOut,
+round(ifnull(sum(SessionDepth)/sum(isUv=1),0),2) as ThePerCapitaBrowsingPages,
+round(ifnull(sum(SessionDepth)/count(distinct Session_Code),0),2) as AvgDepthCount,
+round(ifnull(Sum(LengthOfPage)/count(distinct Session_Code),0),2) as AvgTimeSpent,
+round(ifnull(ifnull(@outnum,0)/count(distinct Session_Code),0),2)*100 as AvgOut,
+@endtime as CreateTime,1 as IsValid
+from slsoft_ias_bus_t_accesslist
+where StatisticsSite_ID =10 and AccessDate between @starttime and @endtime;
+end
+;;
+DELIMITER ;
+
+-- ----------------------------
+-- Procedure structure for `slsoft_ias_bus_p_timing_siteid_7`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_timing_siteid_7`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `slsoft_ias_bus_p_timing_siteid_7`()
+begin
+set @time = '';
+set @starttime = '';
+set @endtime = '';
+select @time:=concat(date(now()),' ',HOUR(now()),':',MINUTE(now()));
+select @starttime:= concat(@time,':00');
+select @endtime:=concat(@time,':59');
+
+set @outnum = 0;
+select @outnum:= sum(a.num) from
+( select session_code ,count(0) as num from slsoft_ias_bus_t_accesslist
+where StatisticsSite_ID=7 and AccessDate between @starttime and @endtime
+group by session_code having count(0) = 1) as a;
+
+  Insert into SLSoft_IAS_Bus_T_FlowAnalysis(
+	Code,StatisticsSite_ID,
+	StatisticsSite_Code,
+	TimeZone,
+	StatisticalDate,
+	Year,
+	Month,
+	Day,
+	Hour,
+	Minute,
+	Second,
+	PV,
+	UV,
+	IP,
+	NewUV,
+	Session,
+	PageLength,
+	PageOut,
+	ThePerCapitaBrowsingPages,
+	AvgDepthCount,
+	AvgTimeSpent,
+	AvgOut,
+	CreateTime,
+	IsValid
+	)
+select UUID() as Code, 7 as StatisticsSite_ID,'' as StatisticsSite_Code,8 as TimeZone,now() as StatisticalDate,Year(now()) as Year,Month(now()) as Month,Day(now()) as Day,HOUR(NOW()) as Hour,MINUTE(NOW()) as Minute,SECOND(NOW()) as Second,
+ifnull(sum(SessionDepth),0) as PV,ifnull(sum(isUv=1),0) as UV,count(distinct  ClientIP) as IP,ifnull(sum(IsNewUV=1),0) as NewUV,count(distinct Session_Code) as Session,
+ifnull(sum(LengthOfPage),0) as PageLength,
+ifnull(@outnum,0) as PageOut,
+round(ifnull(sum(SessionDepth)/sum(isUv=1),0),2) as ThePerCapitaBrowsingPages,
+round(ifnull(sum(SessionDepth)/count(distinct Session_Code),0),2) as AvgDepthCount,
+round(ifnull(Sum(LengthOfPage)/count(distinct Session_Code),0),2) as AvgTimeSpent,
+round(ifnull(ifnull(@outnum,0)/count(distinct Session_Code),0),2)*100 as AvgOut,
+@endtime as CreateTime,1 as IsValid
+from slsoft_ias_bus_t_accesslist
+where StatisticsSite_ID =7 and AccessDate between @starttime and @endtime;
+end
+;;
+DELIMITER ;
+
+-- ----------------------------
+-- Procedure structure for `slsoft_ias_bus_p_update_accesslist`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_update_accesslist`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `slsoft_ias_bus_p_update_accesslist`(IN SessionCode varchar(128),OUT LastTime varchar(64))
+begin
+set @code = '';
+set @AccessDate ='';
+select @code:=code as code,@AccessDate:=AccessDate as AccessDate from SLSoft_IAS_Bus_T_AccessList where Session_Code=CONVERT(SessionCode USING utf8) COLLATE utf8_unicode_ci order by createtime desc limit 1;
+update SLSoft_IAS_Bus_T_AccessList set LengthOfPage = TIMESTAMPDIFF(SECOND,@AccessDate,now()) where Code = @code;
+set LastTime=@AccessDate;
+select LastTime;
+end
+;;
+DELIMITER ;
+
+-- ----------------------------
+-- Procedure structure for `slsoft_ias_bus_p_update_session`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_update_session`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `slsoft_ias_bus_p_update_session`(IN  lastAccessPage varchar(512),IN  SessionCode varchar(128))
+update slsoft_ias_bus_t_session
+  set lastAccessPage=LastAccessPage,LastBrowsingTime=AccessDate,LengthOfSession=LengthOfSession+ TIMESTAMPDIFF(SECOND,AccessDate,now()),SessionDepth=SessionDepth+1,AccessDate=now()
+  where code=CONVERT(SessionCode USING utf8) COLLATE utf8_unicode_ci
+;;
+DELIMITER ;
+
+-- ----------------------------
+-- Procedure structure for `test`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `test`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `test`()
+begin
+set @time = '';
+set @starttime = '';
+set @endtime = '';
+select @time:=concat(date(now()),' ',hour(now()),':',minute(now())-1);
+select @starttime:= concat(@time,':00');
+select @endtime:=concat(@time,':59');
+
+set @outnum = 0;
+select @outnum:= sum(a.num) from
+( select session_code ,count(0) as num from slsoft_ias_bus_t_accesslist
+where StatisticsSite_ID=1 and AccessDate between @starttime and @endtime
+group by session_code having count(0) = 1) as a;
+
+  Insert into SLSoft_IAS_Bus_T_FlowAnalysis(
+	Code,StatisticsSite_ID,
+	StatisticsSite_Code,
+	TimeZone,
+	StatisticalDate,
+	Year,
+	Month,
+	Day,
+	Hour,
+	Minute,
+	Second,
+	PV,
+	UV,
+	IP,
+	NewUV,
+	Session,
+	ThePerCapitaBrowsingPages,
+	AvgDepthCount,
+	AvgTimeSpent,
+	AvgOut,
+	CreateTime,
+	IsValid
+	)
+select UUID() as Code, 1 as StatisticsSite_ID,'' as StatisticsSite_Code,8 as TimeZone,now() as StatisticalDate,Year(now()) as Year,Month(now()) as Month,Day(now()) as Day,Hour(now()) as Hour,Minute(now())-1 as Minute,0 as Second,
+ifnull(sum(SessionDepth),0) as PV,ifnull(sum(isUv=1),0) as UV,count(distinct  ClientIP) as IP,ifnull(sum(IsNewUV=1),0) as NewUV,count(distinct Session_Code) as Session,
+round(ifnull(sum(SessionDepth)/sum(isUv=1),0),2) as ThePerCapitaBrowsingPages,
+round(ifnull(sum(SessionDepth)/count(distinct Session_Code),0),2) as AvgDepthCount,
+round(ifnull(Sum(LengthOfPage)/count(distinct Session_Code),0),2) as AvgTimeSpent,
+round(ifnull(ifnull(@outnum,0)/count(distinct Session_Code),0),2)*100 as AvgOut,now() as CreateTime,1 as IsValid
+from slsoft_ias_bus_t_accesslist
+where StatisticsSite_ID =1 and AccessDate between @starttime and @endtime;
+end
+;;
+DELIMITER ;
+
+-- ----------------------------
+-- Procedure structure for `_Navicat_Temp_Stored_Proc`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `_Navicat_Temp_Stored_Proc`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `_Navicat_Temp_Stored_Proc`(IN StatisticsSite_ID int,IN startDate varchar(64),IN endDate varchar(64))
+set @outnum = 0
+;;
+DELIMITER ;
+
+-- ----------------------------
+-- Function structure for `f_getHostPath`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `f_getHostPath`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `f_getHostPath`(HostPath varchar(500)) RETURNS varchar(128) CHARSET utf8
+BEGIN
+	DECLARE str VARCHAR(128);
+  SET str = SUBSTRING_INDEX (SUBSTRING_INDEX(HostPath , '/' , 3),'/',-1);
+	RETURN str;
+END
+;;
+DELIMITER ;
+
+-- ----------------------------
+-- Function structure for `slsoft_ias_bus_f_getHostPath`
+-- ----------------------------
+DROP FUNCTION IF EXISTS `slsoft_ias_bus_f_getHostPath`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `slsoft_ias_bus_f_getHostPath`(HostPath varchar(500)) RETURNS varchar(128) CHARSET latin1
+BEGIN
+	DECLARE str VARCHAR(128);
+  SET str = SUBSTRING_INDEX (SUBSTRING_INDEX(HostPath , '/' , 3),'/',-1);
+	RETURN str;
+END
+;;
+DELIMITER ;
