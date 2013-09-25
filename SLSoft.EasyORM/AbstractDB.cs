@@ -25,8 +25,11 @@ namespace SLSoft.EasyORM
         public abstract DataTable ExecSql(string strSql);
         public abstract int ExecSqlNoquery(string strSql);
         public abstract DataTable ExecProcedure(string strName, params MySqlParameter[] p);
+        public abstract DataSet ExecProcedureDateSet(string strName, params MySqlParameter[] p);
         public abstract int ExecProNoquery(string strName, params MySqlParameter[] p);
         public abstract DataTable ExecProcedure(string strName, SqlParameter[] p);
         public abstract int ExecProNoquery(string strName, SqlParameter[] p);
+
+        public abstract object ExecuteScalar(string strName, params MySqlParameter[] p);
     }
 }

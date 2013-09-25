@@ -1,0 +1,890 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xml:lang="zh" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>ClickHeat</title>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+    <link href="/clickheat/styles/clickheat.css" type="text/css" rel="stylesheet">body {
+        font-family: arial, helvetica, sans-serif; font-size:0.8em; color:#333; margin:0;
+        } h1 { font-size:1.1em; text-align:center; margin:5px; color:#55d; } th { text-align:left;
+        vertical-align:top; } input { border:1px solid #55b; font-size:12px; } select {
+        border:1px solid #55b; font-size:12px; } form { margin:0px; } img { border:0; padding:0;
+        margin:0; } #clickTable { margin:1px 10px; } #clickTable td { vertical-align:top;
+        } .float-right { padding:10px 10px 0 0; float:right; text-align:right; } #cleaner
+        { color:#fff; background-color:#55b; } #alphaSelector { position:relative; bottom:1px;
+        } #formHeatmap { margin:1px; } #pngDiv { position:absolute; text-align:center; line-height:0;
+        margin:0; padding:0; z-index:99; } #overflowDiv { position:absolute; margin:0; padding:0;
+        overflow-y:auto; } #overflowDiv p { padding:0; margin:0; } #webPageFrame { z-index:1;
+        } #layoutDiv { padding:2px; margin:0 5px; border:1px dashed #446; background-color:#ddf;
+        display:none; } #clickheat-box th { font-weight:normal; } #clickheat-box table {
+        margin-left:auto; margin-right:auto; } #clickheat-box { margin-left:auto; margin-right:auto;
+        border:1px solid #aaf; width:800px; padding:15px; margin-top:20px; clear:right;
+        } #clickheat-box .center { text-align:center; } #clickheat-box th { font-weight:bold;
+        font-size:1em; padding:10px 0 0 10px; color:#55d; border-bottom: 1px solid #aaf;
+        } .error { border:1px solid #faa; background-color:#fee; color:#c00; } .error a
+        { color:#c00; } .clickheat-calendar { border-left:1px solid #bbf; border-top:1px
+        solid #bbf; } .clickheat-calendar th, .clickheat-calendar td { text-align:center;
+        border-right:1px solid #bbf; border-bottom:1px solid #bbf; padding:0 2px; } .clickheat-calendar
+        td { color:#aaa; } .clickheat-calendar a { text-decoration:none; color:#009; } .clickheat-calendar-on
+        { background-color:#bbf; } span.layout-left-fixed, span.layout-left-liquid, span.layout-left-empty
+        { border:1px solid #888; padding:1px; line-height:1.5em; } div.layout-left-fixed,
+        div.layout-left-liquid, div.layout-left-empty { width:70px; border:1px solid #888;
+        } .layout-left-fixed, .layout-center-fixed, .layout-right-fixed { background-color:#66a;
+        } .layout-left-liquid, .layout-center-liquid, .layout-right-liquid { background-color:#aaf;
+        } .layout-left-empty, .layout-right-empty { background-color:#fff; } .layout-center-fixed,
+        .layout-center-liquid { width:55px; margin-left:15px; } .layout-right-fixed, .layout-right-liquid,
+        .layout-right-empty { width:15px; height:70px; margin-left:40px; } #clickheat-js
+        { border:1px solid #66a; background-color:#fff; padding:5px; margin:5px; } #divPanel
+        { margin:0; padding-left:5px; border-bottom:1px solid #66a; background-color:#eef;
+        cursor:pointer; color:#66a; } </link>
+</head>
+<body>
+    <div id="adminPanel">
+        <form id="clickForm" onsubmit="return false;" method="get" action="index.php?">
+        <table id="clickTable" border="0" cellspacing="1" cellpadding="0">
+            <tbody>
+                <tr>
+                    <th>
+                        网址 & 分组
+                    </th>
+                    <td>
+                        <select id="formGroup" onchange="hideGroupLayout(); loadIframe();" name="group">
+                            <optgroup label="http.60.191.205.94.88.flow.flowtrend.cshtml">
+                                <option value="http.60.191.205.94.88.flow.flowtrend.cshtml,index">index</option>
+                            </optgroup>
+                            <optgroup label="http.www.ovcstf.com.default.html">
+                                <option value="http.www.ovcstf.com.default.html,default">default</option>
+                            </optgroup>
+                            <optgroup label="http.www.ovcstf.com.pt.mg.member.login">
+                                <option value="http.www.ovcstf.com.pt.mg.member.login,login">login</option>
+                            </optgroup>
+                            <optgroup label="http.www.whst.gov.cn.default.html">
+                                <option value="http.www.whst.gov.cn.default.html,index">index</option>
+                            </optgroup>
+                        </select>
+                        <a onclick="showGroupLayout(); return false;" href="#">
+                            <img width="16" height="16" alt="Layout" src="/clickheat/images/layout.png">
+                        </a><a onclick="updateHeatmap(); return false;" href="#">
+                            <img width="16" height="16" alt="Refresh" src="/clickheat/images/reload.png">
+                        </a>
+                    </td>
+                    <td rowspan="4">
+                        <table class="clickheat-calendar" border="0" cellspacing="0" cellpadding="0">
+                            <tbody>
+                                <tr>
+                                    <th>
+                                        一
+                                    </th>
+                                    <th>
+                                        二
+                                    </th>
+                                    <th>
+                                        三
+                                    </th>
+                                    <th>
+                                        四
+                                    </th>
+                                    <th>
+                                        五
+                                    </th>
+                                    <th>
+                                        六
+                                    </th>
+                                    <th>
+                                        日
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <td id="clickheat-calendar-101" class="">
+                                        26
+                                    </td>
+                                    <td id="clickheat-calendar-102" class="">
+                                        27
+                                    </td>
+                                    <td id="clickheat-calendar-103" class="">
+                                        28
+                                    </td>
+                                    <td id="clickheat-calendar-104" class="">
+                                        29
+                                    </td>
+                                    <td id="clickheat-calendar-105" class="">
+                                        30
+                                    </td>
+                                    <td id="clickheat-calendar-106" class="">
+                                        31
+                                    </td>
+                                    <td id="clickheat-calendar-1" class="">
+                                        <a onclick="updateCalendar(1); return false;" href="#">1</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td id="clickheat-calendar-2" class="">
+                                        <a onclick="updateCalendar(2); return false;" href="#">2</a>
+                                    </td>
+                                    <td id="clickheat-calendar-3" class="">
+                                        <a onclick="updateCalendar(3); return false;" href="#">3</a>
+                                    </td>
+                                    <td id="clickheat-calendar-4" class="">
+                                        <a onclick="updateCalendar(4); return false;" href="#">4</a>
+                                    </td>
+                                    <td id="clickheat-calendar-5" class="">
+                                        <a onclick="updateCalendar(5); return false;" href="#">5</a>
+                                    </td>
+                                    <td id="clickheat-calendar-6" class="">
+                                        <a onclick="updateCalendar(6); return false;" href="#">6</a>
+                                    </td>
+                                    <td id="clickheat-calendar-7" class="">
+                                        <a onclick="updateCalendar(7); return false;" href="#">7</a>
+                                    </td>
+                                    <td id="clickheat-calendar-8" class="">
+                                        <a onclick="updateCalendar(8); return false;" href="#">8</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td id="clickheat-calendar-9" class="">
+                                        <a onclick="updateCalendar(9); return false;" href="#">9</a>
+                                    </td>
+                                    <td id="clickheat-calendar-10" class="">
+                                        <a onclick="updateCalendar(10); return false;" href="#">10</a>
+                                    </td>
+                                    <td id="clickheat-calendar-11" class="">
+                                        <a onclick="updateCalendar(11); return false;" href="#">11</a>
+                                    </td>
+                                    <td id="clickheat-calendar-12" class="">
+                                        <a onclick="updateCalendar(12); return false;" href="#">12</a>
+                                    </td>
+                                    <td id="clickheat-calendar-13" class="">
+                                        <a onclick="updateCalendar(13); return false;" href="#">13</a>
+                                    </td>
+                                    <td id="clickheat-calendar-14" class="">
+                                        <a onclick="updateCalendar(14); return false;" href="#">14</a>
+                                    </td>
+                                    <td id="clickheat-calendar-15" class="">
+                                        <a onclick="updateCalendar(15); return false;" href="#">15</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td id="clickheat-calendar-16" class="">
+                                        <a onclick="updateCalendar(16); return false;" href="#">16</a>
+                                    </td>
+                                    <td id="clickheat-calendar-17" class="">
+                                        <a onclick="updateCalendar(17); return false;" href="#">17</a>
+                                    </td>
+                                    <td id="clickheat-calendar-18" class="">
+                                        <a onclick="updateCalendar(18); return false;" href="#">18</a>
+                                    </td>
+                                    <td id="clickheat-calendar-19" class="">
+                                        <a onclick="updateCalendar(19); return false;" href="#">19</a>
+                                    </td>
+                                    <td id="clickheat-calendar-20" class="">
+                                        <a onclick="updateCalendar(20); return false;" href="#">20</a>
+                                    </td>
+                                    <td id="clickheat-calendar-21" class="">
+                                        <a onclick="updateCalendar(21); return false;" href="#">21</a>
+                                    </td>
+                                    <td id="clickheat-calendar-22" class="clickheat-calendar-on">
+                                        <a onclick="updateCalendar(22); return false;" href="#">22</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td id="clickheat-calendar-23" class="">
+                                        <a onclick="updateCalendar(23); return false;" href="#">23</a>
+                                    </td>
+                                    <td id="clickheat-calendar-24" class="">
+                                        <a onclick="updateCalendar(24); return false;" href="#">24</a>
+                                    </td>
+                                    <td id="clickheat-calendar-25" class="">
+                                        <a onclick="updateCalendar(25); return false;" href="#">25</a>
+                                    </td>
+                                    <td id="clickheat-calendar-26" class="">
+                                        <a onclick="updateCalendar(26); return false;" href="#">26</a>
+                                    </td>
+                                    <td id="clickheat-calendar-27" class="">
+                                        <a onclick="updateCalendar(27); return false;" href="#">27</a>
+                                    </td>
+                                    <td id="clickheat-calendar-28" class="">
+                                        <a onclick="updateCalendar(28); return false;" href="#">28</a>
+                                    </td>
+                                    <td id="clickheat-calendar-29" class="">
+                                        <a onclick="updateCalendar(29); return false;" href="#">29</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td id="clickheat-calendar-30" class="">
+                                        <a onclick="updateCalendar(30); return false;" href="#">30</a>
+                                    </td>
+                                    <td id="clickheat-calendar-111" class="">
+                                        1
+                                    </td>
+                                    <td id="clickheat-calendar-112" class="">
+                                        2
+                                    </td>
+                                    <td id="clickheat-calendar-113" class="">
+                                        3
+                                    </td>
+                                    <td id="clickheat-calendar-114" class="">
+                                        4
+                                    </td>
+                                    <td id="clickheat-calendar-115" class="">
+                                        5
+                                    </td>
+                                    <td id="clickheat-calendar-116" class="">
+                                        6
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                    <td rowspan="4">
+                        <table class="clickheat-calendar" border="0" cellspacing="0" cellpadding="1">
+                            <tbody>
+                                <tr>
+                                    <th>
+                                        <a onclick="url = window.location.href.replace(/&?date=\d+-\d+-\d+/,''); if (url.search(/\?/) == -1) url += '?'; url += '&date=2013-08-01'; window.location.href = url; return false;"
+                                            href="#">
+                                            <img width="16" height="16" alt="Previous" src="/clickheat/images/previous.png">
+                                        </a>九月 <a onclick="url = window.location.href.replace(/&?date=\d+-\d+-\d+/,''); if (url.search(/\?/) == -1) url += '?'; url += '&date=2013-10-01'; window.location.href = url; return false;"
+                                            href="#">
+                                            <img width="16" height="16" alt="Next" src="/clickheat/images/next.png">
+                                        </a>
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <td id="clickheat-calendar-d" class="clickheat-calendar-on">
+                                        <a onclick="currentRange = 'd'; this.blur(); updateCalendar(); return false;" href="#">
+                                            今天</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td id="clickheat-calendar-w" class="">
+                                        <a onclick="currentRange = 'w'; this.blur(); updateCalendar(); return false;" href="#">
+                                            本周</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td id="clickheat-calendar-m" class="">
+                                        <a onclick="currentRange = 'm'; this.blur(); updateCalendar(); return false;" href="#">
+                                            本月</a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        浏览器
+                    </th>
+                    <td>
+                        <select id="formBrowser" onchange="updateHeatmap();" name="browser">
+                            <option value="all">全部</option>
+                            <option value="msie">Internet Explorer</option>
+                            <option value="firefox">Firefox</option>
+                            <option value="chrome">Chrome</option>
+                            <option value="safari">Safari</option>
+                            <option value="opera">Opera</option>
+                            <option value="unknown">其他/未知</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        热图样式和覆盖层透明度
+                    </th>
+                    <td>
+                        <input id="formHeatmap" type="checkbox" checked="checked" onclick="updateHeatmap();"
+                            name="heatmap">
+                        <span id="alphaSelector"><a id="alpha-level-0" style="font-size: 12px; border-top: 1px solid #888;
+                            border-bottom: 1px solid #888; border-left: 1px solid #888; text-decoration: none;
+                            background-color: rgb(255,255,255);" onclick="changeAlpha(0); this.blur(); return false;"
+                            href="#"></a><a id="alpha-level-4" style="font-size: 12px; border-top: 1px solid #888;
+                                border-bottom: 1px solid #888; text-decoration: none; background-color: rgb(246,246,246);"
+                                onclick="changeAlpha(4); this.blur(); return false;" href="#"></a><a id="alpha-level-7"
+                                    style="font-size: 12px; border-top: 1px solid #888; border-bottom: 1px solid #888;
+                                    text-decoration: none; background-color: rgb(238,238,238);" onclick="changeAlpha(7); this.blur(); return false;"
+                                    href="#"></a><a id="alpha-level-10" style="font-size: 12px; border-top: 1px solid #888;
+                                        border-bottom: 1px solid #888; text-decoration: none; background-color: rgb(229,229,229);"
+                                        onclick="changeAlpha(10); this.blur(); return false;" href="#"></a><a id="alpha-level-14"
+                                            style="font-size: 12px; border-top: 1px solid #888; border-bottom: 1px solid #888;
+                                            text-decoration: none; background-color: rgb(221,221,221);" onclick="changeAlpha(14); this.blur(); return false;"
+                                            href="#"></a><a id="alpha-level-17" style="font-size: 12px; border-top: 1px solid #888;
+                                                border-bottom: 1px solid #888; text-decoration: none; background-color: rgb(212,212,212);"
+                                                onclick="changeAlpha(17); this.blur(); return false;" href="#">
+                            </a><a id="alpha-level-20" style="font-size: 12px; border-top: 1px solid #888; border-bottom: 1px solid #888;
+                                text-decoration: none; background-color: rgb(204,204,204);" onclick="changeAlpha(20); this.blur(); return false;"
+                                href="#"></a><a id="alpha-level-24" style="font-size: 12px; border-top: 1px solid #888;
+                                    border-bottom: 1px solid #888; text-decoration: none; background-color: rgb(195,195,195);"
+                                    onclick="changeAlpha(24); this.blur(); return false;" href="#"></a><a id="alpha-level-27"
+                                        style="font-size: 12px; border-top: 1px solid #888; border-bottom: 1px solid #888;
+                                        text-decoration: none; background-color: rgb(187,187,187);" onclick="changeAlpha(27); this.blur(); return false;"
+                                        href="#"></a><a id="alpha-level-30" style="font-size: 12px; border-top: 1px solid #888;
+                                            border-bottom: 1px solid #888; text-decoration: none; background-color: rgb(178,178,178);"
+                                            onclick="changeAlpha(30); this.blur(); return false;" href="#"></a>
+                            <a id="alpha-level-34" style="font-size: 12px; border-top: 1px solid #888; border-bottom: 1px solid #888;
+                                text-decoration: none; background-color: rgb(170,170,170);" onclick="changeAlpha(34); this.blur(); return false;"
+                                href="#"></a><a id="alpha-level-37" style="font-size: 12px; border-top: 1px solid #888;
+                                    border-bottom: 1px solid #888; text-decoration: none; background-color: rgb(161,161,161);"
+                                    onclick="changeAlpha(37); this.blur(); return false;" href="#"></a><a id="alpha-level-40"
+                                        style="font-size: 12px; border-top: 1px solid #888; border-bottom: 1px solid #888;
+                                        text-decoration: none; background-color: rgb(153,153,153);" onclick="changeAlpha(40); this.blur(); return false;"
+                                        href="#"></a><a id="alpha-level-44" style="font-size: 12px; border-top: 1px solid #888;
+                                            border-bottom: 1px solid #888; text-decoration: none; background-color: rgb(144,144,144);"
+                                            onclick="changeAlpha(44); this.blur(); return false;" href="#"></a>
+                            <a id="alpha-level-47" style="font-size: 12px; border-top: 1px solid #888; border-bottom: 1px solid #888;
+                                text-decoration: none; background-color: rgb(136,136,136);" onclick="changeAlpha(47); this.blur(); return false;"
+                                href="#"></a><a id="alpha-level-50" style="font-size: 12px; border-top: 1px solid #888;
+                                    border-bottom: 1px solid #888; text-decoration: none; background-color: rgb(127,127,127);"
+                                    onclick="changeAlpha(50); this.blur(); return false;" href="#"></a><a id="alpha-level-54"
+                                        style="font-size: 12px; border-top: 1px solid #888; border-bottom: 1px solid #888;
+                                        text-decoration: none; background-color: rgb(119,119,119);" onclick="changeAlpha(54); this.blur(); return false;"
+                                        href="#"></a><a id="alpha-level-57" style="font-size: 12px; border-top: 1px solid #888;
+                                            border-bottom: 1px solid #888; text-decoration: none; background-color: rgb(110,110,110);"
+                                            onclick="changeAlpha(57); this.blur(); return false;" href="#"></a>
+                            <a id="alpha-level-60" style="font-size: 12px; border-top: 1px solid #888; border-bottom: 1px solid #888;
+                                text-decoration: none; background-color: rgb(102,102,102);" onclick="changeAlpha(60); this.blur(); return false;"
+                                href="#"></a><a id="alpha-level-64" style="font-size: 12px; border-top: 1px solid #888;
+                                    border-bottom: 1px solid #888; text-decoration: none; background-color: rgb(93,93,93);"
+                                    onclick="changeAlpha(64); this.blur(); return false;" href="#"></a><a id="alpha-level-67"
+                                        style="font-size: 12px; border-top: 1px solid #888; border-bottom: 1px solid #888;
+                                        text-decoration: none; background-color: rgb(85,85,85);" onclick="changeAlpha(67); this.blur(); return false;"
+                                        href="#"></a><a id="alpha-level-70" style="font-size: 12px; border-top: 1px solid #888;
+                                            border-bottom: 1px solid #888; text-decoration: none; background-color: rgb(76,76,76);"
+                                            onclick="changeAlpha(70); this.blur(); return false;" href="#"></a>
+                            <a id="alpha-level-74" style="font-size: 12px; border-top: 1px solid #888; border-bottom: 1px solid #888;
+                                text-decoration: none; background-color: rgb(68,68,68);" onclick="changeAlpha(74); this.blur(); return false;"
+                                href="#"></a><a id="alpha-level-77" style="font-size: 12px; border-top: 1px solid #888;
+                                    border-bottom: 1px solid #888; text-decoration: none; background-color: rgb(59,59,59);"
+                                    onclick="changeAlpha(77); this.blur(); return false;" href="#"></a><a id="alpha-level-80"
+                                        style="font-size: 12px; border-top: 2px solid rgb(85, 85, 187); border-bottom: 2px solid rgb(85, 85, 187);
+                                        text-decoration: none; background-color: rgb(51, 51, 51);" onclick="changeAlpha(80); this.blur(); return false;"
+                                        href="#"></a><a id="alpha-level-84" style="font-size: 12px; border-top: 1px solid #888;
+                                            border-bottom: 1px solid #888; text-decoration: none; background-color: rgb(42,42,42);"
+                                            onclick="changeAlpha(84); this.blur(); return false;" href="#"></a>
+                            <a id="alpha-level-87" style="font-size: 12px; border-top: 1px solid #888; border-bottom: 1px solid #888;
+                                text-decoration: none; background-color: rgb(34,34,34);" onclick="changeAlpha(87); this.blur(); return false;"
+                                href="#"></a><a id="alpha-level-90" style="font-size: 12px; border-top: 1px solid #888;
+                                    border-bottom: 1px solid #888; text-decoration: none; background-color: rgb(25,25,25);"
+                                    onclick="changeAlpha(90); this.blur(); return false;" href="#"></a><a id="alpha-level-94"
+                                        style="font-size: 12px; border-top: 1px solid #888; border-bottom: 1px solid #888;
+                                        text-decoration: none; background-color: rgb(17,17,17);" onclick="changeAlpha(94); this.blur(); return false;"
+                                        href="#"></a><a id="alpha-level-97" style="font-size: 12px; border-top: 1px solid #888;
+                                            border-bottom: 1px solid #888; border-right: 1px solid #888; text-decoration: none;
+                                            background-color: rgb(8,8,8);" onclick="changeAlpha(97); this.blur(); return false;"
+                                            href="#"></a></span>
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        屏幕大小
+                    </th>
+                    <td>
+                        <select id="formScreen" onchange="resizeDiv(); updateHeatmap();" name="screen">
+                            <option value="0">全部</option>
+                            <option value="240">240px</option>
+                            <option value="640">640px</option>
+                            <option value="800">800px</option>
+                            <option value="1024">1024px</option>
+                            <option value="1152">1152px</option>
+                            <option value="1280">1280px</option>
+                            <option value="1440">1440px</option>
+                            <option value="1600">1600px</option>
+                            <option value="1800">1800px</option>
+                        </select>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        </form>
+    </div>
+    <div id="divPanel" onclick="hidePanel();" onmouseover="showPanel();">
+        <img width="11" height="6" alt="" src="/clickheat/images/arrow-up.png">
+    </div>
+    <script src="/clickheat/js/admin.js" type="text/javascript">
+        /**
+        ** Main functions for administration of ClickHeat
+        **
+        ** @author Yvan Taviaud - Labsmedia.com
+        ** @since 01/04/2007
+        **/
+        var currentAlpha = 80,
+lastDayOfMonth = 0,
+weekDays = [],
+currentDate = [0, 0, 0, 0, 0, 0],
+currentRange = 'd',
+currentWidth = 0,
+pleaseWait = '',
+cleanerRunning = '',
+isJsOkay = '',
+jsAdminCookie = '',
+hideIframes = true,
+hideFlashes = true,
+isPiwikModule = false,
+scriptPath = '',
+scriptIndexPath = '';
+        /** Show layout's parameters */
+        function showRadioLayout() {
+            for (var i = 0; i < 7; i += 1) {
+                document.getElementById('layout-span-' + i).style.display = (document.getElementById('layout-radio-' + i).checked ? 'block' : 'none');
+            }
+        }
+        /** Change Alpha on heatmap */
+        function changeAlpha(alpha) {
+            document.getElementById('alpha-level-' + currentAlpha).style.borderTop = '1px solid #888';
+            document.getElementById('alpha-level-' + currentAlpha).style.borderBottom = '1px solid #888';
+            currentAlpha = alpha;
+            document.getElementById('alpha-level-' + currentAlpha).style.borderTop = '2px solid #55b';
+            document.getElementById('alpha-level-' + currentAlpha).style.borderBottom = '2px solid #55b';
+            for (var i = 0; i < document.images.length; i += 1) {
+                if (document.images[i].id.search(/^heatmap-\d+$/) === 0) {
+                    document.images[i].style.opacity = alpha / 100;
+                    if (document.body.filters) {
+                        document.images[i].style.filter = 'alpha(opacity=' + alpha + ')';
+                    }
+                }
+            }
+        }
+        /** Returns the "top" value of an element */
+        function getTop(obj) {
+            if (obj.offsetParent) {
+                return (obj.offsetTop + getTop(obj.offsetParent));
+            }
+            else {
+                return obj.offsetTop;
+            }
+        }
+        /** Resize the div relative to window height and selected screen size */
+        function resizeDiv() {
+            var oD = document.documentElement && document.documentElement.clientHeight !== 0 ? document.documentElement : document.body, iH = oD.innerHeight || oD.clientHeight, iW = oD.innerWidth || oD.clientWidth;
+            document.getElementById('overflowDiv').style.height = (iH < 300 ? 400 : iH) - getTop(document.getElementById('overflowDiv')) + 'px';
+            /** Width of main display */
+            iW = iW < 300 ? 400 : iW;
+            if (document.getElementById('formScreen').value === '0') {
+                currentWidth = iW;
+            }
+            else {
+                currentWidth = document.getElementById('formScreen').value - 5;
+            }
+            document.getElementById('overflowDiv').style.width = currentWidth + 'px';
+            document.getElementById('webPageFrame').style.width = currentWidth - 25 + 'px';
+        }
+        /** Ajax object */
+        function getXmlHttp() {
+            var xmlhttp = false;
+            try {
+                xmlhttp = new ActiveXObject("Msxml2.XMLHTTP");
+            }
+            catch (e) {
+                try {
+                    xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+                }
+                catch (oc) {
+                    xmlhttp = null;
+                }
+            }
+            if (!xmlhttp && typeof (XMLHttpRequest) !== 'undefined') {
+                xmlhttp = new XMLHttpRequest();
+            }
+            return xmlhttp;
+        }
+        /** Ajax request to update PNGs */
+        function updateHeatmap() {
+            var xmlhttp, screen = 0;
+            document.getElementById('pngDiv').innerHTML = '&nbsp;<div style="line-height:20px"><span class="error">' + pleaseWait + '</span></div>';
+            xmlhttp = getXmlHttp();
+            if (document.getElementById('formScreen').value === '0') {
+                screen = -1 * currentWidth + 25;
+            }
+            else {
+                screen = document.getElementById('formScreen').value;
+            }
+            xmlhttp.open('GET', scriptIndexPath + 'action=generate&group=' + document.getElementById('formGroup').value + '&screen=' + screen + '&browser=' + document.getElementById('formBrowser').value + '&date=' + currentDate[2] + '-' + currentDate[1] + '-' + currentDate[0] + '&range=' + currentRange + '&heatmap=' + (document.getElementById('formHeatmap').checked ? '1' : '0') + '&rand=' + Date(), true);
+            xmlhttp.onreadystatechange = function () {
+                if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
+                    document.getElementById('pngDiv').innerHTML = xmlhttp.responseText.replace(/_JAVASCRIPT_/, isJsOkay);
+                    document.getElementById('webPageFrame').height = document.getElementById('pngDiv').offsetHeight;
+                    changeAlpha(currentAlpha);
+                }
+            };
+            xmlhttp.send(null);
+        }
+        /** Update calendar selected days */
+        function updateCalendar(day) {
+            var min, max, week, d;
+            if (isPiwikModule === true) {
+                return;
+            }
+            /** currentDate[day, month, year, saved_day, month_origin, year_origin] */
+            if (day) {
+                currentDate[3] = day;
+            }
+            currentDate[1] = currentDate[4];
+            currentDate[2] = currentDate[5];
+            /** Showing one day */
+            if (currentRange === 'd') {
+                /** Remember the last day used */
+                currentDate[0] = currentDate[3];
+                min = currentDate[0];
+                max = currentDate[0];
+            }
+            /** Showing one month */
+            if (currentRange === 'm') {
+                currentDate[0] = 1;
+                min = 1;
+                max = weekDays.length;
+            }
+            /** Showing one week */
+            if (currentRange === 'w') {
+                /** Remember the last day used */
+                currentDate[0] = currentDate[3];
+                week = weekDays[currentDate[0]];
+                min = 0;
+                max = 0;
+                for (d = 1; d < weekDays.length; d += 1) {
+                    if (weekDays[d] === week) {
+                        if (min === 0) {
+                            currentDate[0] = d;
+                            min = d;
+                        }
+                        max = d;
+                    }
+                }
+                /** Start was on the previous month */
+                if (min === 1 && max !== 7) {
+                    currentDate[0] = lastDayOfMonth - 6 + max;
+                    currentDate[1] -= 1;
+                    if (currentDate[1] === 0) {
+                        currentDate[1] = 12;
+                        currentDate[2] -= 1;
+                    }
+                }
+            }
+            for (d = 1; d < weekDays.length; d += 1) {
+                document.getElementById('clickheat-calendar-' + d).className = (d >= min && d <= max ? 'clickheat-calendar-on' : '');
+            }
+            for (d = 1; d < 7; d += 1) {
+                if (document.getElementById('clickheat-calendar-10' + d)) {
+                    document.getElementById('clickheat-calendar-10' + d).className = (currentRange === 'w' && weekDays[min] === weekDays[1] ? 'clickheat-calendar-on' : '');
+                }
+                if (document.getElementById('clickheat-calendar-11' + d)) {
+                    document.getElementById('clickheat-calendar-11' + d).className = (currentRange === 'w' && weekDays[max] === weekDays[weekDays.length - 1] ? 'clickheat-calendar-on' : '');
+                }
+            }
+            document.getElementById('clickheat-calendar-d').className = (currentRange === 'd' ? 'clickheat-calendar-on' : '');
+            document.getElementById('clickheat-calendar-w').className = (currentRange === 'w' ? 'clickheat-calendar-on' : '');
+            document.getElementById('clickheat-calendar-m').className = (currentRange === 'm' ? 'clickheat-calendar-on' : '');
+            updateHeatmap();
+        }
+        /** Ajax request to show group layout */
+        function showGroupLayout() {
+            var xmlhttp;
+            xmlhttp = getXmlHttp();
+            xmlhttp.open('GET', scriptIndexPath + 'action=layout&group=' + document.getElementById('formGroup').value + '&rand=' + Date(), true);
+            xmlhttp.onreadystatechange = function () {
+                if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
+                    document.getElementById('layoutDiv').innerHTML = xmlhttp.responseText;
+                    document.getElementById('layoutDiv').style.display = 'block';
+                    showRadioLayout();
+                }
+            };
+            xmlhttp.send(null);
+        }
+        /** Hide group layout */
+        function hideGroupLayout() {
+            document.getElementById('layoutDiv').style.display = 'none';
+            document.getElementById('layoutDiv').innerHTML = '';
+        }
+        /** Update JS code in display */
+        function updateJs() {
+            var str = '',
+language = (navigator.language && navigator.language === 'fr' ? 'fr' : 'com'),
+addReturn = document.getElementById('jsShort').checked ? '' : '<br />',
+linkList = [],
+rand;
+            str += '&lt;script type="text/javascript" src="';
+            str += scriptPath + 'js/clickheat.js"&gt;&lt;/script&gt;' + addReturn;
+            if (language === 'fr') {
+                linkList = ['&lt;a href="http://www.dugwood.fr/clickheat/index.html"&gt;ClickHeat&lt;/a&gt;', '&lt;a href="http://www.dugwood.fr/index.html"&gt;Module Heatmap&lt;/a&gt;', '&lt;a href="http://www.dugwood.fr/index.html"&gt;CMS&lt;/a&gt;', '&lt;a href="http://www.dugwood.fr/index.html"&gt;Outils Open Source&lt;/a&gt;'];
+            }
+            else {
+                linkList = ['&lt;a href="http://www.dugwood.com/clickheat/index.html"&gt;ClickHeat&lt;/a&gt;', '&lt;a href="http://www.dugwood.com/index.html"&gt;Heatmap plugin&lt;/a&gt;', '&lt;a href="http://www.dugwood.com/index.html"&gt;CMS&lt;/a&gt;', '&lt;a href="http://www.dugwood.com/index.html"&gt;Open Source Sofware&lt;/a&gt;'];
+            }
+            if (document.getElementById('jsShowImage').checked) {
+                str += '&lt;a href="http://www.labsmedia.' + language + '/clickheat/index.html" title="ClickHeat: clicks heatmap"&gt;&lt;img src="' + scriptPath + 'images/logo.png" width="80" height="15" border="0" alt="ClickHeat : track clicks" /&gt;&lt;/a&gt;' + addReturn;
+            }
+            else {
+                rand = Math.floor(Math.random() * linkList.length);
+                str += '&lt;noscript&gt;&lt;p&gt;' + linkList[rand] + '&lt;/p&gt;&lt;/noscript&gt;' + addReturn;
+            }
+            str += '&lt;script type="text/javascript"&gt;&lt;!--<br />';
+            str += 'clickHeatSite = ';
+            /*jslint regexp: false*/
+            /** Piwik form */
+            if (isPiwikModule === true) {
+                /*global piwik: false */
+                str += piwik.idSite;
+            }
+            else {
+                str += '\'<span class="error">' + document.getElementById('jsSite').value.replace(/[^a-z0-9\-_\.]+/gi, '.') + '</span>\'';
+            }
+            str += ';' + addReturn + 'clickHeatGroup = ';
+            if (document.getElementById('jsGroup1').checked) {
+                str += '\'<span class="error">' + document.getElementById('jsGroup').value.replace(/[^a-z0-9\-_\.]+/gi, '.') + '</span>\'';
+            }
+            if (document.getElementById('jsGroup2').checked) {
+                str += '(document.title == \'\' ? \'-none-\' : encodeURIComponent(document.title))';
+            }
+            if (document.getElementById('jsGroup3').checked) {
+                str += 'encodeURIComponent(window.location.pathname+window.location.search)';
+            }
+            str += ';' + addReturn;
+            if (document.getElementById('jsQuota').value !== '0') {
+                str += 'clickHeatQuota = <span class="error">' + document.getElementById('jsQuota').value.replace(/[^0-9]*/g, '') + '</span>;' + addReturn;
+            }
+            /*jslint regexp: true*/
+            str += 'clickHeatServer = \'' + scriptPath + 'click.php\';' + addReturn;
+            str += 'initClickHeat(); //--&gt;<br />';
+            str += '&lt;/script&gt;';
+            document.getElementById('clickheat-js').innerHTML = str;
+        }
+        /** Ajax request to show javascript code */
+        function showJsCode() {
+            var xmlhttp;
+            xmlhttp = getXmlHttp();
+            xmlhttp.open('GET', scriptIndexPath + 'action=javascript&rand=' + Date(), true);
+            xmlhttp.onreadystatechange = function () {
+                if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
+                    document.getElementById('layoutDiv').innerHTML = xmlhttp.responseText;
+                    document.getElementById('layoutDiv').style.display = 'block';
+                    updateJs();
+                }
+            };
+            xmlhttp.send(null);
+        }
+        /** Ajax request to get associated group in iframe */
+        function loadIframe() {
+            var xmlhttp;
+            xmlhttp = getXmlHttp();
+            xmlhttp.open('GET', scriptIndexPath + 'action=iframe&group=' + document.getElementById('formGroup').value + '&rand=' + Date(), true);
+            xmlhttp.onreadystatechange = function () {
+                if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
+                    if (document.getElementById('webPageFrame').src.indexOf('clickempty.html') !== -1) {
+                        document.getElementById('webPageFrame').src = xmlhttp.responseText;
+                        updateCalendar();
+                    }
+                    else {
+                        document.getElementById('webPageFrame').src = xmlhttp.responseText;
+                        updateHeatmap();
+                    }
+                }
+            };
+            xmlhttp.send(null);
+        }
+        /** Show layout's parameters */
+        function saveGroupLayout() {
+            var i, xmlhttp;
+            for (i = 0; i < 7; i += 1) {
+                if (document.getElementById('layout-radio-' + i).checked) {
+                    break;
+                }
+            }
+            if (i === 7) {
+                alert('Error');
+                return false;
+            }
+            xmlhttp = getXmlHttp();
+            xmlhttp.open('GET', scriptIndexPath + 'action=layoutupdate&group=' + document.getElementById('formGroup').value + '&url=' + encodeURIComponent(document.getElementById('formUrl').value) + '&left=' + document.getElementById('layout-left-' + i).value + '&right=' + document.getElementById('layout-right-' + i).value + '&center=' + document.getElementById('layout-center-' + i).value + '&rand=' + Date(), true);
+            xmlhttp.onreadystatechange = function () {
+                if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
+                    if (xmlhttp.responseText !== 'OK') {
+                        alert(xmlhttp.responseText);
+                    }
+                    hideGroupLayout();
+                    loadIframe();
+                }
+            };
+            xmlhttp.send(null);
+        }
+        /** Hide iframe's flashes and iframes */
+        function cleanIframe() {
+            var currentIframeContent, currentIframe, newContent, pos, pos2, reg, oldPos, startReg, endReg, found, width, height;
+            if (document.getElementById('webPageFrame').src.search('clickempty.html') !== -1) {
+                return true;
+            }
+            if (hideIframes === false && hideFlashes === false) {
+                return true;
+            }
+            try {
+                currentIframe = document.getElementById('webPageFrame');
+                if (currentIframe.contentDocument) {
+                    currentIframeContent = currentIframe.contentDocument;
+                }
+                else if (currentIframe.Document) {
+                    currentIframeContent = currentIframe.Document;
+                }
+                /** Hide iframes and flashes content */
+                if (!currentIframeContent) {
+                    return false;
+                }
+                newContent = currentIframeContent.body.innerHTML;
+                oldPos = 0;
+                if (hideIframes === false) {
+                    reg = 'object';
+                }
+                else {
+                    if (hideFlashes === false) {
+                        reg = 'iframe';
+                    }
+                    else {
+                        reg = 'object|iframe';
+                    }
+                }
+                startReg = new RegExp('<(' + reg + ')', 'i');
+                endReg = new RegExp('<\/(' + reg + ')', 'i');
+                while (true) {
+                    pos = newContent.search(startReg);
+                    pos2 = newContent.search(endReg);
+                    if (pos === -1 || pos2 === -1 || pos === oldPos || pos > pos2) {
+                        break;
+                    }
+                    pos2 += 9;
+                    found = newContent.substring(pos, pos2);
+                    width = found.match(/width=["']?(\d+)/); // " quote for Zend
+                    if (width === null) {
+                        width = [0, 300];
+                    }
+                    height = found.match(/height=["']?(\d+)/); // " quote for Zend
+                    if (height === null) {
+                        height = [0, 150];
+                    }
+                    newContent = newContent.substring(0, pos) + '<span style="margin:0; padding:' + Math.ceil(height[1] / 2) + 'px ' + Math.ceil(width[1] / 2) + 'px; line-height:' + (height[1] * 1 + 10) + 'px; border:1px solid #00f; background-color:#aaf; font-size:0;">Flash/Iframe</span>&nbsp;' + newContent.substring(pos2, newContent.length);
+                    oldPos = pos;
+                }
+                currentIframeContent.body.innerHTML = newContent;
+            }
+            catch (e) { }
+        }
+        /** Draw alpha selector */
+        function drawAlphaSelector(obj, max) {
+            var str = '', i, grey, alpha;
+            for (i = 0; i < max; i += 1) {
+                grey = 255 - Math.ceil(i * 255 / max);
+                alpha = Math.ceil(i * 100 / max);
+                str += '<a href="#" id="alpha-level-' + alpha + '" onclick="changeAlpha(' + alpha + '); this.blur(); return false;" style="font-size:12px; border-top:1px solid #888; border-bottom:1px solid #888;' + (i === 0 ? ' border-left:1px solid #888;' : '') + '' + (i === (max - 1) ? ' border-right:1px solid #888;' : '') + ' text-decoration:none; background-color:rgb(' + grey + ',' + grey + ',' + grey + ');">&nbsp;</a>';
+            }
+            document.getElementById(obj).innerHTML = str;
+            /** Check that currentAlpha exists */
+            while (!document.getElementById('alpha-level-' + currentAlpha)) {
+                currentAlpha -= 1;
+            }
+        }
+        /** Ajax request to show javascript code */
+        function runCleaner() {
+            document.getElementById('cleaner').innerHTML = cleanerRunning;
+            var xmlhttp;
+            xmlhttp = getXmlHttp();
+            xmlhttp.open('GET', scriptIndexPath + 'action=cleaner&rand=' + Date(), true);
+            xmlhttp.onreadystatechange = function () {
+                if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
+                    if (xmlhttp.responseText === 'OK') {
+                        document.getElementById('cleaner').innerHTML = '';
+                    }
+                    else {
+                        document.getElementById('cleaner').innerHTML = xmlhttp.responseText;
+                        if (xmlhttp.responseText.indexOf('JSLint') === -1) {
+                            setTimeout(function () {
+                                document.getElementById('cleaner').innerHTML = '';
+                            }, 3000);
+                        }
+                        else {
+                            document.getElementById('cleaner').style.display = 'block';
+                            document.getElementById('cleaner').style.textAlign = 'left';
+                            document.getElementById('cleaner').style.marginTop = '100px';
+                        }
+                    }
+                }
+            };
+            xmlhttp.send(null);
+        }
+        /** Ajax request to show latest available version */
+        function showLatestVersion() {
+            var xmlhttp;
+            xmlhttp = getXmlHttp();
+            xmlhttp.open('GET', scriptIndexPath + 'action=latest&rand=' + Date(), true);
+            xmlhttp.onreadystatechange = function () {
+                if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
+                    document.getElementById('layoutDiv').innerHTML = xmlhttp.responseText;
+                    document.getElementById('layoutDiv').style.display = 'block';
+                }
+            };
+            xmlhttp.send(null);
+        }
+        /** Shows main panel */
+        function showPanel() {
+            var div = (isPiwikModule === true ? 'contenu' : 'adminPanel');
+            if (document.getElementById(div).style.display !== 'none') {
+                return true;
+            }
+            if (isPiwikModule === true) {
+                document.getElementById('topBars').style.display = 'block';
+                document.getElementById('header').style.display = 'block';
+            }
+            document.getElementById(div).style.display = 'block';
+            document.getElementById('divPanel').innerHTML = '<img src="' + scriptPath + 'images/arrow-up.png" width="11" height="6" alt="" />';
+            resizeDiv();
+        }
+        /** Hides main panel */
+        function hidePanel() {
+            var div = (isPiwikModule === true ? 'contenu' : 'adminPanel');
+            if (isPiwikModule === true) {
+                document.getElementById('topBars').style.display = 'none';
+                document.getElementById('header').style.display = 'none';
+            }
+            document.getElementById(div).style.display = 'none';
+            document.getElementById('divPanel').innerHTML = '<img src="' + scriptPath + 'images/arrow-down.png" width="11" height="6" alt="" />';
+            resizeDiv();
+        }
+        /** Reverse the state of the admin cookie (used not to log the clicks for admin user) */
+        function adminCookie() {
+            if (confirm(jsAdminCookie)) {
+                document.cookie = 'clickheat-admin=; expires=Fri, 27 Jul 2001 01:00:00 UTC; path=/';
+            }
+            else {
+                var date = new Date();
+                date.setTime(date.getTime() + 365 * 86400 * 1000);
+                document.cookie = 'clickheat-admin=1; expires=' + date.toGMTString() + '; path=/';
+            }
+        }
+    </script>
+    <div id="overflowDiv" style="height: 205px; width: 1366px;">
+        <div id="layoutDiv">
+        </div>
+        <div id="pngDiv">
+            <div style="line-height: 20px;">
+                <span class="error">暂时没有点击记录 (可能是由您选择的条件限制引起，建议取消或修改限制后重试: 如浏览器，屏幕大小等). <a onclick="showJsCode(); return false;"
+                    href="#">请检查javascript代码是否已正确粘贴到了页面中。</a> </span>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+<!--
+        weekDays = [, 35, 36, 36, 36, 36, 36, 36, 36, 37, 37, 37, 37, 37, 37, 37, 38, 38, 38, 38, 38, 38, 38, 39, 39, 39, 39, 39, 39, 39, 40]; pleaseWait = '正在生成图像，请稍等...';
+        cleanerRunning = '正在清理...';
+        isJsOkay = '<a href="#" onclick="showJsCode(); return false;">请检查javascript代码是否已正确粘贴到了页面中。</a>';
+        jsAdminCookie = '为了防止统计干扰，你可以选择是否记录自己的点击\n\n确认 = 记录\n取消 = 不记录';
+        hideIframes = true;
+        hideFlashes = true;
+        scriptPath = 'https://60.191.205.94/clickheat/';
+        scriptIndexPath = 'index.php?';
+        lastDayOfMonth = 31;
+        currentDate = [22, 9, 2013, 22, 9, 2013];
+        currentAlpha = 80;
+        /** Draw the alpha selector */
+        drawAlphaSelector('alphaSelector', 30);
+        /** Resize the main div */
+        resizeDiv();
+        /** Load iframe (which will load the heatmap once the info is okay) */
+        loadIframe();
+        /** Run cleaner */
+        runCleaner(); //-->
+    </script>
+</body>
+</html>

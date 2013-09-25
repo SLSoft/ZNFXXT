@@ -1,0 +1,61 @@
+﻿@{
+    ViewBag.Title = "Show";
+}
+
+<script type="text/javascript">
+    var sid = GetLocationParam("sId");
+    var strurl = GetLocationParam("strUrl");
+    var sdate = GetLocationParam("sDate");
+
+    //var t_url = "http://60.191.205.94/UserView?sId=" + sid + "&strUrl=" + strurl + "&sDate=" + sdate;
+    var t_url = "/UserView?sId=" + sid + "&strUrl=" + strurl + "&sDate=" + sdate;
+
+    function setlinkstyle() {
+        alert($(".linknode").length);
+        $(".linknode").each(function () {
+            var top = $(this).offset().top;
+            var left = $(this).offset().left;
+            var height = $(this).height();
+            var width = $(this).width();
+            var lpv = $(this).attr("pv");
+            var luv = $(this).attr("uv");
+            if (lpv > 0) {
+                $("#layoutdiv").html($("#layoutdiv").html() + "<div style='line-height:14px;cursor:pointer;color:#000;filter:alpha(opacity=70);opacity:0.7;position:absolute;z-index:2147482990;background-color:rgb(51,204,0);top:" + top + "px;left:" + left + "px;width:" + width + "px;height:" + height + "px;'>" + $(this).attr("pec") + "</div>");
+            }
+        });
+    }
+    function GetLocationParam(param) {
+        var request = {
+            QueryString: function (val) {
+                var uri = window.location.search;
+                var re = new RegExp("" + val + "=([^&?]*)", "ig");
+                return ((uri.match(re)) ? (decodeURI(uri.match(re)[0].substr(val.length + 1))) : '');
+            }
+        }
+        return request.QueryString(param);
+    }
+    $.ajax({
+        url: t_url,
+        type: "POST",
+        async: false,
+        contentType: "application/json; charset=utf-8",
+        data: "{}",
+        dataType: "json",
+        success: function (data) {
+            document.write(data);
+
+
+        },
+        error: function ErrorCallback(XMLHttpRequest, textStatus, errorThrown) {
+            alert(errorThrown + ":" + textStatus);
+        }
+    });
+    $(function () {
+
+        setlinkstyle();
+
+    });
+
+    
+</script>
+

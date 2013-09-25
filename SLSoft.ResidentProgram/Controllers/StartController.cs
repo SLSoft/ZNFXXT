@@ -10,10 +10,11 @@ using MySql.Data.MySqlClient;
 using System.Web.Caching;
 using System.Web.Security;
 using System.Data;
+using System.Text;
 
 namespace SLSoft.ResidentProgram.Controllers
 {
-    public class StartController : Controller
+    public class StartController : BaseController
     {
         //
         // GET: /Start/
@@ -22,15 +23,14 @@ namespace SLSoft.ResidentProgram.Controllers
         AbstractDB db = null;
         DataTable dtIP = null;
         DataRow[] drIP = null;
-        /* 测试用参数*/
+        /* 测试用参数
         string sId = "1";
-        string showId = "1";
+        string showId = "1";*/
 
-        /* 发布用参数
-        string sId = "0";
+        /* 发布用参数*/
+        public string sId = "0";
         string showId = "0";
-        */
-
+        
         /// <summary>
         /// 根据参数返回js驻留脚本
         /// </summary>
@@ -45,73 +45,19 @@ namespace SLSoft.ResidentProgram.Controllers
                     sId = Request.QueryString["sId"].ToString();
                     showId = Request.QueryString["show_id"].ToString();
 
+                    if (Request.Cookies["siteID"] != null)
+                    {
+                        Request.Cookies.Remove("siteID");
+                    }
+
                     strCode = getCode(sId, showId);//获取符合要求的js
-
-                    setCookie(sId);//设置cookie值
-
-                    dtIP = GetTableIP();
-                    drIP = GetIPInfo(Request.UserHostAddress);
-                    Session["drIP"] = drIP;
-
                 }
             }
             catch (Exception)
             {
             }
-            //ViewBag.strCode = strCode;
             return strCode;
         }
-
-        #region 设置cookie
-        private void setCookie(string sId)
-        {
-            if (Request.Cookies[string.Format("SLSoft_IA_{0}", sId)] == null)
-            {
-                CreateCookie(sId);
-            }
-            else
-            {
-                UpdateCookie(sId);
-            }
-        }
-
-        private void CreateCookie(string sId)
-        {
-            HttpCookie MyCookie = new HttpCookie(string.Format("SLSoft_IA_{0}", sId));
-
-            MyCookie["SessionCode"] = Guid.NewGuid().ToString();
-            MyCookie["SessionType"] = "0";//0:代表新session 1:代表有效session
-            MyCookie["ApplicationCode"] = Guid.NewGuid().ToString();
-            MyCookie["ApplicationType"] = "0";//0：代表新Application
-            MyCookie["LastAccessTime"] = DateTime.Now.ToString();//最后一次访问时间
-            MyCookie["NowTime"] = DateTime.Now.ToString();
-            MyCookie.Expires = DateTime.Now.AddDays(1);
-
-            Response.Cookies.Add(MyCookie);
-            Session[string.Format("SLSoft_IA_{0}", sId)] = MyCookie["SessionCode"].ToString();
-        }
-
-        private void UpdateCookie(string sId)
-        {
-            HttpCookie MyCookie = Request.Cookies[string.Format("SLSoft_IA_{0}", sId)];
-
-            if (Session[string.Format("SLSoft_IA_{0}", sId)] == null)
-            {
-                Session[string.Format("SLSoft_IA_{0}", sId)] = Guid.NewGuid().ToString();
-                MyCookie["SessionType"] = "0";//0:代表新session 1:代表有效session
-                MyCookie["SessionCode"] = Session[string.Format("SLSoft_IA_{0}", sId)].ToString();
-            }
-            else
-            {
-                MyCookie["SessionType"] = "1";//0:代表新session 1:代表有效session
-            }
-            MyCookie["ApplicationType"] = "1";//0:代表新Application 1:代表旧的Application
-            Session["AccessLength"] = GetLengthOfSession();
-            MyCookie["LastAccessTime"] = DateTime.Now.ToString();
-
-            Response.Cookies.Set(MyCookie);
-        }
-        #endregion
 
         /// <summary>
         /// 获取符合要求的js驻留代码
@@ -119,7 +65,7 @@ namespace SLSoft.ResidentProgram.Controllers
         /// <param name="sId">网站id</param>
         /// <param name="show_id">效果id</param>
         /// <returns></returns>
-        private string getCode(string sId, string show_id)
+        public string getCode(string s_Id, string show_id)
         {
             string strReturn ="";
 
@@ -127,19 +73,55 @@ namespace SLSoft.ResidentProgram.Controllers
 
             return strReturn;
         }
-
-        public ActionResult Context()
-        {
-            return View();
-        }
-
+        
         public ActionResult GetData(FormCollection fc)
         {
+            dtIP = GetTableIP();
+
+            if (fc.Count == 0)
+            {
+                fc = SetPostData(GetDocumentContents(Request));
+            }
             Information im = FormatMessage(fc);
+
+            drIP = GetIPInfo(im.UserHostAddress);
+            Session["drIP"] = drIP;
 
             SaveInformation(im);
 
+            return Json(new {sId = im.sId});
+        }
+
+        //将参数设置为键值格式
+        public FormCollection SetPostData(string strData)
+        {
+            if (string.IsNullOrEmpty(strData)) return null;
+
+            string[] arry = strData.Split('&');
+            FormCollection fc = new FormCollection();
+
+            for (int i = 0; i < arry.Length; i++)
+            {
+                string[] items = arry[i].Split('=');
+                fc.Add(items[0], Server.UrlDecode(items[1]));
+            }
+            return fc;
+        }
+        public ActionResult setStr()
+        {
             return View();
+        }
+        private string GetDocumentContents(System.Web.HttpRequestBase Request)
+        {
+            string documentContents;
+            using (Stream receiveStream = Request.InputStream)
+            {
+                using (StreamReader readStream = new StreamReader(receiveStream, Encoding.UTF8))
+                {
+                    documentContents = readStream.ReadToEnd();
+                }
+            }
+            return documentContents;
         }
 
         #region 获取客户端信息
@@ -148,7 +130,8 @@ namespace SLSoft.ResidentProgram.Controllers
             Information im = new Information();
 
             //js数据
-            im.IsMove = fc["isMove"];//是否移动终端
+            im.sId = fc["sId"];//站点id
+            im.IsMove = fc["isMove"]; //是否移动终端
             im.MoveType = fc["moveType"];//移动终端类型
             im.BrowserType = fc["browserType"];//浏览器类型
             im.BrowserKernel = fc["browserKernel"];//浏览器内核
@@ -164,18 +147,19 @@ namespace SLSoft.ResidentProgram.Controllers
             im.VColor = fc["vColor"];//色彩
             im.Zone = fc["zone"];//时区
             im.PageUpUrl = fc["pageUpUrl"];//上一页URL
-            im.CurrentName = fc["currentName"];//当前域名
-            im.CurrentUrl = fc["currentUrl"];//当前URL
-            im.currentUrlTitle = fc["currentUrlTitle"];//当前URL标题
+            im.CurrentName = fc["cName"];//当前域名
+            im.CurrentUrl = fc["cUrl"];//当前URL
+            im.currentUrlTitle = fc["cUrlTitle"];//当前URL标题
             im.ParentUrl = fc["parentUrl"];//父窗口URL
 
             //cookie数据
-            HttpCookie cookie = Request.Cookies[string.Format("SLSoft_IA_{0}", sId)];
-            im.SessionCode = cookie["SessionCode"].ToString();
-            im.SessionType = cookie["SessionType"].ToString();
-            im.ApplicationCode = cookie["ApplicationCode"].ToString();
-            im.ApplicationType = cookie["ApplicationType"].ToString();
-            im.LastAccessTime = cookie["LastAccessTime"].ToString();
+            im.UserCode = fc["userCode"].ToString();
+            im.SessionCode = fc["session"].ToString();
+            im.SessionType = fc["stype"].ToString();
+            im.ApplicationType = fc["atype"].ToString();
+            im.OperType = fc["otype"].ToString();
+            im.AccessCount = fc["count"].ToString();
+            im.LastAccessTime = DateTime.Now.ToString();
 
             //服务器数据
             im.UserHostName = System.Net.Dns.GetHostName();//客户端计算机名
@@ -191,19 +175,22 @@ namespace SLSoft.ResidentProgram.Controllers
         #region 操作数据
         private void SaveInformation(Information im)
         {
-            if (im.SessionType == "0")
+            try
             {
-                Insert_T_Session(im);
+                if (im.OperType == "0")
+                {
+                    Insert_T_Session(im);
+                }
+                else
+                {
+                    Update_T_Session(im);
+                    Update_T_SessionDetails(im);//修改上一条访问时长
+                }
+                Insert_T_SessionDetails(im);
             }
-            else
+            catch (Exception)
             {
-                Update_T_Session(im);
             }
-            Insert_T_SessionDetails(im);
-
-            Cache _cache = HttpRuntime.Cache;
-            _cache.Remove("slsoft_t_session_" + sId);
-            _cache.Remove("slsoft_t_accesslist_" + sId);
         }
 
         //添加信息到访问表
@@ -212,24 +199,26 @@ namespace SLSoft.ResidentProgram.Controllers
             db = df.CreateDB("mysql");
 
             MySqlParameter[] mpara ={
-                new MySqlParameter("Code",im.SessionCode),
-                new MySqlParameter("StatisticsSite_ID", 1),
+                new MySqlParameter("Code",im.SessionCode==null?Guid.NewGuid().ToString():im.SessionCode),
+                new MySqlParameter("UserCode",im.UserCode),
+                new MySqlParameter("StatisticsSite_ID", im.sId),
                 new MySqlParameter("StatisticsSite_Code", Guid.NewGuid().ToString()),
-                new MySqlParameter("SourceClass_ID", GetSourceClassID(im.PageUpUrl)),
-                new MySqlParameter("SourceClass_Code", 1),
+                new MySqlParameter("SourceClass_ID", GetSourceClassID(im.PageUpUrl,im.CurrentName)),
+                new MySqlParameter("SourceClass_Code", GetSoureName(im.PageUpUrl).Split('|').GetValue(0).ToString()),
                 new MySqlParameter("SourcePath", im.PageUpUrl),
-                new MySqlParameter("LastAccessPage", im.CurrentName),
-                new MySqlParameter("LengthOfSession", "0"),
+                new MySqlParameter("SourceKey",GetSoureName(im.PageUpUrl).Split('|').GetValue(1).ToString()),
+                new MySqlParameter("LastAccessPage", im.CurrentUrl),
+                new MySqlParameter("LengthOfSession", "0"),//访问时长
                 new MySqlParameter("SessionDepth", 1),
                 new MySqlParameter("TimeZone", im.Zone),
-                new MySqlParameter("IsUV", IsUV(Request.UserHostAddress,Request.Cookies[string.Format("SLSoft_IA_{0}", sId)]["SessionType"],Request.UserAgent,im.IsCookie)),
-                new MySqlParameter("IsNewUV", IsNewUV(Request.UserHostAddress,Request.Cookies[string.Format("SLSoft_IA_{0}", sId)]["ApplicationType"],Request.UserAgent,im.IsCookie)),
-                new MySqlParameter("LastBrowsingTime", DateTime.Now),
-                new MySqlParameter("NumberOfVisits", 1),
+                new MySqlParameter("IsUV", IsUV(im.UserHostAddress,im.SessionType,Request.UserAgent,im.IsCookie)),
+                new MySqlParameter("IsNewUV", IsNewUV(im.UserHostAddress,im.ApplicationType,Request.UserAgent,im.IsCookie)),
+                new MySqlParameter("LastBrowsingTime", im.LastAccessTime),//上次访问时间
+                new MySqlParameter("NumberOfVisits", im.AccessCount),
                 new MySqlParameter("NetworkAccessProvider", GetNAPByIPAddress()),
                 new MySqlParameter("Language", im.SysLanguage),
-                new MySqlParameter("DeviceType", "0"),
-                new MySqlParameter("AboutDevice", ""),
+                new MySqlParameter("DeviceType", im.IsMove=="否"?"0":"1"),
+                new MySqlParameter("AboutDevice", im.MoveType),
                 new MySqlParameter("OperationSystem", im.OS),
                 new MySqlParameter("Resolution", im.Size),
                 new MySqlParameter("Color", im.VColor),
@@ -252,43 +241,31 @@ namespace SLSoft.ResidentProgram.Controllers
             db.ExecProNoquery("slsoft_ias_bus_p_insert_session", mpara);
         }
 
-        //修改访问表
-        private void Update_T_Session(Information im)
-        {
-            db = df.CreateDB("mysql");
-
-            MySqlParameter[] mpara = {
-                new MySqlParameter("lastAccessPage", im.CurrentUrl),
-                new MySqlParameter("LengthOfSessionStep",Session["AccessLength"].ToString()),
-                new MySqlParameter("SessionCode", im.SessionCode)
-            };
-            db.ExecProNoquery("slsoft_ias_bus_p_update_session", mpara);
-        }
-
         //添加信息到访问明细表
         private void Insert_T_SessionDetails(Information im)
         {
             db = df.CreateDB("mysql");
 
             MySqlParameter[] mpara = {
-                new MySqlParameter("StatisticsSite_ID", 1),
+                new MySqlParameter("StatisticsSite_ID", im.sId),
                 new MySqlParameter("StatisticsSite_Code", Guid.NewGuid().ToString()),
                 new MySqlParameter("Session_Code", im.SessionCode),
-                new MySqlParameter("SourceClass_ID", GetSourceClassID(im.PageUpUrl)),
-                new MySqlParameter("SourceClass_Code", 1),
+                new MySqlParameter("SourceClass_ID", GetSourceClassID(im.PageUpUrl,im.CurrentName)),
+                new MySqlParameter("SourceClass_Code", GetSoureName(im.PageUpUrl).Split('|').GetValue(0).ToString()),
                 new MySqlParameter("SourcePath", im.PageUpUrl),
-                new MySqlParameter("LastAccessPage", im.CurrentName),
-                new MySqlParameter("LengthOfPage", "0"),
+                new MySqlParameter("SourceKey",GetSoureName(im.PageUpUrl).Split('|').GetValue(1).ToString()),
+                new MySqlParameter("LastAccessPage", im.CurrentUrl),
+                new MySqlParameter("LengthOfPage", "0"),//停留时长
                 new MySqlParameter("SessionDepth", 1),
                 new MySqlParameter("TimeZone", im.Zone),
-                new MySqlParameter("IsUV", IsUV(Request.UserHostAddress,Request.Cookies[string.Format("SLSoft_IA_{0}", sId)]["SessionType"],Request.UserAgent,im.IsCookie)),
-                new MySqlParameter("IsNewUV", IsNewUV(Request.UserHostAddress,Request.Cookies[string.Format("SLSoft_IA_{0}", sId)]["ApplicationType"],Request.UserAgent,im.IsCookie)),
-                new MySqlParameter("LastBrowsingTime", DateTime.Now),
+                new MySqlParameter("IsUV", IsUV(im.UserHostAddress,im.SessionType,Request.UserAgent,im.IsCookie)),
+                new MySqlParameter("IsNewUV", IsNewUV(im.UserHostAddress,im.ApplicationType,Request.UserAgent,im.IsCookie)),
+                new MySqlParameter("LastBrowsingTime", im.LastAccessTime),
                 new MySqlParameter("NumberOfVisits", 1),
                 new MySqlParameter("NetworkAccessProvider", GetNAPByIPAddress()),
                 new MySqlParameter("Language", im.SysLanguage),
-                new MySqlParameter("DeviceType", "0"),
-                new MySqlParameter("AboutDevice", ""),
+                new MySqlParameter("DeviceType", im.IsMove=="否"?"0":"1"),
+                new MySqlParameter("AboutDevice", im.MoveType),
                 new MySqlParameter("OperationSystem", im.OS),
                 new MySqlParameter("Resolution", im.Size),
                 new MySqlParameter("Color", im.VColor),
@@ -310,6 +287,33 @@ namespace SLSoft.ResidentProgram.Controllers
             };
             db.ExecProNoquery("slsoft_ias_bus_p_insert_accesslist", mpara);
         }
+
+        //修改访问表
+        private void Update_T_Session(Information im)
+        {
+            db = df.CreateDB("mysql");
+
+            MySqlParameter[] mpara = {
+                new MySqlParameter("lastAccessPage", im.CurrentUrl),
+                new MySqlParameter("SessionCode", im.SessionCode)
+            };
+            db.ExecProNoquery("slsoft_ias_bus_p_update_session", mpara);
+        }
+
+        //修改访问明细表（修改访问时长）
+        private void Update_T_SessionDetails(Information im)
+        {
+            db = df.CreateDB("mysql");
+
+            MySqlParameter[] mpara = new MySqlParameter[2];
+            mpara[0] = new MySqlParameter("SessionCode", im.SessionCode);
+            mpara[1] = new MySqlParameter("LastTime","");
+            mpara[1].MySqlDbType = MySqlDbType.VarChar;
+            mpara[1].Direction = ParameterDirection.Output;
+
+            db.ExecProcedure("slsoft_ias_bus_p_update_accesslist", mpara);
+            im.LastAccessTime = mpara[1].Value.ToString()==""?DateTime.Now.ToString():mpara[1].Value.ToString();
+        }
         #endregion
 
         #region 获取参数方法
@@ -320,11 +324,11 @@ namespace SLSoft.ResidentProgram.Controllers
         /// <param name="CookieType"></param>
         /// <param name="UA"></param>
         /// <returns></returns>
-        private int IsUV(string ClientIP,string CookieType,string UA,string IsCookie)
+        private int IsUV(string ClientIP,string SessionType,string UA,string IsCookie)
         {
             if (IsCookie == "1")
             {
-                if (CookieType == "0")
+                if (SessionType == "1")
                 {
                     return 1;
                 }
@@ -338,9 +342,9 @@ namespace SLSoft.ResidentProgram.Controllers
                 db = df.CreateDB("mysql");
 
                 MySqlParameter[] mpara = {
-                new MySqlParameter("StatisticsSite_ID", sId),
-                new MySqlParameter("ClientIP",ClientIP),
-                new MySqlParameter("UserAgentMD5", FormsAuthentication.HashPasswordForStoringInConfigFile(UA,"md5"))
+                new MySqlParameter("SiteID", sId),
+                new MySqlParameter("IP",ClientIP),
+                new MySqlParameter("UAMD5", FormsAuthentication.HashPasswordForStoringInConfigFile(UA,"md5"))
                 };
                 string value = db.ExecProcedure("slsoft_ias_bus_p_check_isUV", mpara).Rows[0][0].ToString();
                 if (value == "0")
@@ -358,15 +362,12 @@ namespace SLSoft.ResidentProgram.Controllers
         /// 是否新的独立访客（0:不是;1是）
         /// </summary>
         /// <param name="ClientIP"></param>
-        /// <param name="CookieMessage"></param>
-        /// <param name="UA"></param>
-        /// <param name="IsCookie"></param>
         /// <returns></returns>
-        private int IsNewUV(string ClientIP, string CookieType, string UA, string IsCookie)
+        private int IsNewUV(string ClientIP, string ApplicationType, string UA, string IsCookie)
         {
             if (IsCookie == "1")
             {
-                if (CookieType == "0")
+                if (ApplicationType == "1")
                 {
                     return 1;
                 }
@@ -380,10 +381,10 @@ namespace SLSoft.ResidentProgram.Controllers
                 db = df.CreateDB("mysql");
 
                 MySqlParameter[] mpara = {
-                new MySqlParameter("StatisticsSite_ID", sId),
-                new MySqlParameter("ClientIP",ClientIP),
-                new MySqlParameter("UserAgentMD5", FormsAuthentication.HashPasswordForStoringInConfigFile(UA,"md5"))
-                };
+                new MySqlParameter("SiteID", sId),
+                new MySqlParameter("IP",ClientIP),
+                new MySqlParameter("UAMD5", FormsAuthentication.HashPasswordForStoringInConfigFile(UA,"md5"))
+            };
                 string value = db.ExecProcedure("slsoft_ias_bus_p_check_isNewUV", mpara).Rows[0][0].ToString();
                 if (value == "0")
                 {
@@ -463,57 +464,46 @@ namespace SLSoft.ResidentProgram.Controllers
             string ip = GetIpLong(ClientIp);
             if (dtIP != null)
             {
-                return dtIP.Select(string.Format("'{0}'>= AIP and '{0}' <= BIP", ip));
+                DataRow[] row = dtIP.Select(string.Format("'{0}'>= AIP and '{0}' <= BIP", ip));
+                if (row.Count() > 0)
+                {
+                    return row;
+                }
             }
-            else
-            {
-                return null;
-            }
+            return null;
         }
 
+        Common.SearchKeyword searchkey = new Common.SearchKeyword();
+
         //访问来源类别（1.直接输入网址或书签 2.搜索引擎 3.内部链接 4.外部链接）
-        private int GetSourceClassID(string sourceurl)
+        private int GetSourceClassID(string sourceurl,string currurl)
         {
-            if (sourceurl == "")
+            if (string.IsNullOrEmpty(sourceurl))
                 return 1;
-            if (sourceurl.IndexOf("baidu") > 0 || sourceurl.IndexOf("google") > 0)
+            if (searchkey.IsSearchEnginesGet(sourceurl))
                 return 2;
+            if (sourceurl.IndexOf(currurl) != -1)
+                return 3;
             return 4;
         }
 
-        //获取访问时长（秒）
-        private int GetLengthOfSession()
+        //分析搜索引擎url 得到引擎名称
+        private string GetSoureName(string sourceurl)
         {
-            DateTime NowTime = DateTime.Now;
-            DateTime LastBrowsingTime = DateTime.Now;
-
-            if (Request.Cookies["SLSoft_IA_1"]["LastAccessTime"] != null)
+            string Keyword = "";
+            string Engine = "";
+            if (!string.IsNullOrEmpty(sourceurl))
             {
-                LastBrowsingTime = Convert.ToDateTime(Request.Cookies["SLSoft_IA_1"]["LastAccessTime"].ToString());
+                //判断是否搜索引擎链接
+                if (searchkey.IsSearchEnginesGet(sourceurl))
+                {
+                    //取得搜索关键字
+                    Keyword = searchkey.SearchKey(sourceurl);
+                    //取得搜索引擎名称
+                    Engine = searchkey.EngineName;
+                }
             }
-            TimeSpan ts = NowTime - LastBrowsingTime;
-            return ts.Seconds;
-        }
-        
-        #endregion
-
-        #region 缓存IP表
-        private DataTable GetTableIP()
-        {
-            Cache _cache = HttpRuntime.Cache;
-            DataTable dt = null;
-            db = df.CreateDB("mysql");
-
-            if (_cache["slsoft_t_IP"] == null)
-            {
-                dt = db.ExecSql("select * from slsoft_ias_bus_t_ip");
-                _cache.Insert("slsoft_t_IP", dt, null, new DateTime(2099, 12, 31), TimeSpan.Zero);
-            }
-            else
-            {
-                dt = (DataTable)_cache["slsoft_t_IP"];
-            }
-            return dt;
+            return Engine + "|" + Keyword;
         }
         #endregion
     }

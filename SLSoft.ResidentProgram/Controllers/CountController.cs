@@ -22,8 +22,8 @@ namespace SLSoft.ResidentProgram.Controllers
 
         public ActionResult Index()
         {
-            dtSession = GetTableSession(1, "2013-08-02 00:00:00", "2013-08-31 00:00:00");
-            dtAccessList = GetTableAccesslist(1, "2013-08-02 00:00:00", "2013-08-31 00:00:00"); 
+            //dtSession = GetTableSession(1, "2013-08-02 00:00:00", "2013-08-31 00:00:00");
+            //dtAccessList = GetTableAccesslist(1, "2013-08-02 00:00:00", "2013-08-31 00:00:00"); 
             //ViewBag.PVcount =  GetPVCount();
             //ViewBag.UVcount = GetUVCount();
             //ViewBag.IPcount = GetIPCount();
@@ -33,7 +33,7 @@ namespace SLSoft.ResidentProgram.Controllers
             //ViewBag.TimeSpent =GetDateDiff(GetTimeSpent());
             //ViewBag.AvgTimeSpent = GetDateDiff(GetAvgTimeSpent());
 
-            ViewBag.icount = Insert_T_FlowAnalysis(1);
+            //ViewBag.icount = Insert_T_FlowAnalysis(1);
 
             return View();
         }
@@ -281,9 +281,9 @@ namespace SLSoft.ResidentProgram.Controllers
                 new MySqlParameter("NewUV", GetNewUVCount()),
                 new MySqlParameter("Session", GetAccessCount()),
                 new MySqlParameter("ThePerCapitaBrowsingPages",GetBrowsePageCount()),
-                new MySqlParameter("Name", GetAvgDepthCount()),
-                new MySqlParameter("WorkUnit", GetAvgTimeSpent()),
-                new MySqlParameter("MobilePhone", GetAvgOutCount())
+                new MySqlParameter("AvgDepthCount", GetAvgDepthCount()),
+                new MySqlParameter("AvgTimeSpent", GetAvgTimeSpent()),
+                new MySqlParameter("AvgOut", GetAvgOutCount())
             };
             return db.ExecProNoquery("slsoft_ias_bus_p_insert_flowanalysis", mpara);
         }

@@ -14,6 +14,7 @@ namespace SLSoft.ResidentProgram.Models
         /// <summary>
         /// js数据
         /// </summary>
+        public string sId { set; get; }//站点ID
         public string IsMove { set; get; }//是否移动终端
         public string MoveType { set; get; }//移动终端类型
         public string BrowserType { set; get; }//浏览器类型
@@ -38,11 +39,13 @@ namespace SLSoft.ResidentProgram.Models
         /// <summary>
         /// cookie数据
         /// </summary>
+        public string UserCode { set; get; }//用户唯一标识
         public string SessionCode { set; get; }//cookie过期时间
-        public string SessionType { set; get; }//0:代表新session 1:代表有效session
-        public string ApplicationCode { set; get; }
+        public string SessionType { set; get; }//是否IsUV
+        public string ApplicationType { set; get; }//是否IsNewUV
+        public string AccessCount { set; get; }//当日访问次数
         public string LastAccessTime { set; get; }//上一次访问时间
-        public string ApplicationType { set; get; }
+        public string OperType { set; get; }//操作类型
 
         /// <summary>
         /// 服务器数据

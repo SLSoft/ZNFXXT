@@ -34,6 +34,16 @@ namespace SLSoft.EasyORM
             return MySqlHelper.ExecuteDataSet(conn, CommandType.StoredProcedure, strName, p).Tables[0];
         }
 
+        public override DataSet ExecProcedureDateSet(string strName, params MySqlParameter[] p)
+        {
+            return MySqlHelper.ExecuteDataSet(conn, CommandType.StoredProcedure, strName, p);
+        }
+
+        public override object ExecuteScalar(string strName, params MySqlParameter[] p)
+        {
+            return MySqlHelper.ExecuteScalar(conn,CommandType.StoredProcedure,strName,p);
+        }
+
         public override int ExecProNoquery(string strName, params MySqlParameter[] p)
         {
             return MySqlHelper.ExecuteNonQuery(conn, CommandType.StoredProcedure, strName, p);

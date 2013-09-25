@@ -47,5 +47,14 @@ namespace SLSoft.EasyORM
         {
             return 0;
         }
+        public override object ExecuteScalar(string strName, params MySqlParameter[] p)
+        {
+            return null;
+        }
+
+        public override DataSet ExecProcedureDateSet(string strName, params MySqlParameter[] p)
+        {
+            return null;
+        }
     }
 }

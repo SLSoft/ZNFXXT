@@ -3,7 +3,6 @@
     var moveType = ""; //移动终端类型
     var browserType = ""; //浏览器类型
     var bVersions = ""; //浏览器版本
-
     getBrowser();
     chckeMove();
     var bLanguage = navigator.language; //浏览器语言
@@ -14,11 +13,11 @@
     var OS = getOS(); //操作系统
     var size = screen.width + "*" + screen.height; //分辨率
     var isCookie = CookieEnable(); //是否支持cookie
-    var plugins = getPlugins(); //插件 不支持IE
+    var plugins = ""; //插件 不支持IE
     var vColor = ""; //色彩
     var vDate = new Date();
     var zone = (0 - vDate.getTimezoneOffset() / 60); //时区
-    var pageUpUrl = document.referrer; //上一页URL
+    var pageUpUrl = UrlDecode(document.referrer); //上一页URL
     var currentName = window.location.host; //当前域名
     var currentUrl = window.location; //当前URL
     var currentUrlTitle = document.title; //当前URL标题
@@ -27,28 +26,158 @@
     if (!bLanguage) { bLanguage = navigator.browserLanguage; }
     if (!sysLanguage) { sysLanguage = navigator.language; }
     if (!userLanguage) { userLanguage = navigator.language; }
+    if (!cpuType) { cpuType = "x86"; }
     if (navigator.appName == "Netscape") { vColor = screen.pixelDepth; } else { vColor = screen.colorDepth; }
 
-    var strJSON = '{"isMove":"' + isMove + '","moveType":"' + moveType + '","browserType":"' + browserType + '","browserKernel":"' + browserKernel + '","bVersions":"' + bVersions + '","bLanguage":"' + bLanguage + '","sysLanguage":"' + sysLanguage + '","userLanguage":"' + userLanguage + '","cpuType":"' + cpuType + '","OS":"' + OS + '","size":"' + size + '","isCookie":"' + isCookie + '","plugins":"' + plugins + '","vColor":"' + vColor + '","zone":"' + zone + '","pageUpUrl":"' + pageUpUrl + '","currentName":"' + currentName + '","currentUrl":"' + currentUrl + '","parentUrl":"' + parentUrl + '","currentUrlTitle":"' + currentUrlTitle + '"}';
-    var myData = jQuery.parseJSON(strJSON);
+    var sId = GetSiteId();
+    if (!sId) { sId = 0;}
 
+    var cookieId = ''; //用户唯一标识
+    var session = ''; //session会话
+    var sessiontype = 0; //是否独立访客
+    var apptype = 0; //是否新的独立访客(0:否 1:是)
+    var count = 0; //当日访问次数
+    var totalcount = 0; //总访问次数
+    var otype = 0; //后台数据库操作
 
-    $.ajax({
-        type: "POST",
-        url: "/Start/GetData",
-        data: myData,
-        dataType: "json",
-        success: function (res) {
-            //                if (res.success) {
-            //                    alert("操作成功");
-            //                } else {
-            //                    alert("操作失败 ：" + res.message);
-            //                }
-        },
-        error: function () {
-            //alert("发生错误。");
-        }        
-    });
+    //用户第一次访问设置为新用户
+    if (CheckCookie("SLSoft_IA_USER_" + sId)) {
+        apptype = 1;
+        cookieId = newGuid();
+        totalcount = 1;
+    }
+    else {
+        var values = GetCookie("SLSoft_IA_USER_" + sId);
+        cookieId = GetValue(values, "usercode");
+        totalcount = GetValue(values, "totalcount");
+
+        if (CheckCookie("SLSoft_IA_SESSION" + sId)) {
+            totalcount = parseInt(totalcount) + 1;
+        }
+    }
+    var usercookie = "usercode=" + cookieId + "&apptype=" + apptype + "&totalcount=" + totalcount;
+    setCookie("SLSoft_IA_USER_" + sId, usercookie, 1); //有效期2年
+
+    if (!CheckCookie("SLSoft_IA_SESSION" + sId)) {//已存在
+        otype = 1; //操作数据库类型
+        session = GetCookie("SLSoft_IA_SESSION" + sId); //获取session值
+        var values = GetCookie("SLSoft_IA_TYPE_" + sId);
+        count = GetValue(values, "count");
+    }
+    else {
+        session = newGuid();
+        if (!CheckCookie("SLSoft_IA_TYPE_" + sId)) {
+            var values = GetCookie("SLSoft_IA_TYPE_" + sId);
+            count = GetValue(values, "count");
+            count = parseInt(count) + 1;
+        }
+        else {
+            count += 1;
+            sessiontype = 1;
+        }
+    }
+    var typecookie = "count=" + count + "&sessiontype=" + sessiontype;
+    setCookie("SLSoft_IA_TYPE_" + sId, typecookie, 3);  //有效期当天
+    setCookie("SLSoft_IA_SESSION" + sId, session, 2); //有效期30分钟
+
+    var cookie = "userCode=" + cookieId + "&session=" + session + "&stype=" + sessiontype + "&atype=" + apptype + "&otype=" + otype + "&count=" + count;
+    var data = "sId=" + sId + "&isMove=" + getEncode(isMove) + "&moveType=" + getEncode(moveType) + "&browserType=" + getEncode(browserType) + "&browserKernel=" + getEncode(browserKernel) + "&bVersions=" + bVersions + "&bLanguage=" + bLanguage + "&sysLanguage=" + sysLanguage + "&userLanguage=" + userLanguage + "&cpuType=" + cpuType + "&OS=" + OS + "&size=" + size + "&isCookie=" + isCookie + "&plugins=" + getEncode(plugins) + "&vColor=" + vColor + "&zone=" + zone + "&pageUpUrl=" + getEncode(pageUpUrl) + "&cName=" + getEncode(currentName) + "&cUrl=" + currentUrl + "&parentUrl=" + parentUrl + "&cUrlTitle=" + getEncode(currentUrlTitle) + "&" + cookie;
+
+    if (browserType == "IE") {
+        var xdr = new XDomainRequest();
+        xdr.open("POST", "/Start/GetData");
+        xdr.send(data);
+    }
+    else {
+
+        var xmlHttpRequest = getXmlHttpRequest();
+        if (xmlHttpRequest == null) return false;
+        xmlHttpRequest.open("POST", "/Start/GetData", true);
+        xmlHttpRequest.setRequestHeader("CONTENT-TYPE", "application/x-www-form-urlencoded");
+        xmlHttpRequest.send(data);
+    }
+
+    function getXmlHttpRequest() {
+        var xmlHttpRequest = null;
+        try {
+            xmlHttpRequest = new ActiveXObject("Msxml2.XMLHTTP");
+        }
+        catch (e1) {
+            try {
+                xmlHttpRequest = new ActiveXObject("Microsoft.XMLHTTP");
+            } catch (e2) {
+                xmlHttpRequest = null;
+            }
+        }
+        if (xmlHttpRequest == null && typeof (XMLHttpRequest) != 'undefined') {
+            xmlHttpRequest = new XMLHttpRequest();
+        }
+        return xmlHttpRequest;
+    }
+
+    function getEncode(arguments) {
+        return encodeURIComponent(arguments);
+    }
+
+    function GetValue(c, n) {
+        var values = c.split(/[\?&]/);
+        var tmpStr = n + "=";
+        for (var i = 0; i < values.length; i++)
+            if (values[i].search(eval("/^" + tmpStr + "/i")) != -1) return values[i].substring(tmpStr.length);
+    }
+    //写Cookies
+    function setCookie(name, value, time) {
+        var exp = new Date();
+        if (time == 1) {
+            exp.setTime(exp.getTime() + 2 * 365 * 24 * 60 * 60 * 1000);
+        }
+        else if (time == 2) {
+            exp.setMinutes(exp.getMinutes() + 30)
+        }
+        else if (time == 3) {
+            exp.setDate(exp.getDate() + 1);
+            exp.setHours(0);
+            exp.setMinutes(0);
+            exp.setSeconds(0);
+        }
+        document.cookie = name + "=" + escape(value) + ";expires=" + exp.toGMTString();
+    }
+    //读cookies
+    function GetCookie(sName) {
+        var sSearch = sName + "=";
+        if (document.cookie.length > 0) {
+            offset = document.cookie.indexOf(sSearch)
+            if (offset != -1) {
+                offset += sSearch.length;
+                end = document.cookie.indexOf(";", offset)
+                if (end == -1) end = document.cookie.length;
+                return unescape(document.cookie.substring(offset, end))
+            }
+            else return ""
+        }
+    }
+
+    //检查cookie
+    function CheckCookie(name) {
+        var arr, reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)");
+        if (arr = document.cookie.match(reg)) {
+            return false; //已经登录过
+        }
+        else {
+            return true; //没有登录
+        }
+    }
+
+    function newGuid() {
+        var guid = "";
+        for (var i = 1; i <= 32; i++) {
+            var n = Math.floor(Math.random() * 16.0).toString(16);
+            guid += n;
+            if ((i == 8) || (i == 12) || (i == 16) || (i == 20))
+                guid += "-";
+        }
+        return guid;
+    }
 
     //是否移动终端
     function chckeMove() {
@@ -67,10 +196,11 @@
         }
         if (browser.versions.mobile) {
             isMove = "是";
-            if (browser.versions.ios) { moveType = "ios终端"; }
-            else if (browser.versions.android) { moveType = "android"; }
+            if (browser.versions.android) { moveType = "android"; }
             else if (browser.versions.iPhone) { moveType = "iPhone"; }
             else if (browser.versions.iPad) { moveType = "iPad"; }
+            else if (browser.versions.ios) { moveType = "ios终端"; }
+            else if (browser.versions.webApp) { moveType = "Safari"; }
             else { moveType = "其他"; }
         } else { isMove = "否"; }
     }
@@ -170,4 +300,35 @@
         }
         return str;
     }
+    function UrlDecode(zipStr) {
+        var uzipStr = "";
+        for (var i = 0; i < zipStr.length; i++) {
+            var chr = zipStr.charAt(i);
+            if (chr == "+") {
+                uzipStr += " ";
+            } else if (chr == "%") {
+                var asc = zipStr.substring(i + 1, i + 3);
+                if (parseInt("0x" + asc) > 0x7f) {
+                    uzipStr += decodeURI("%" + asc.toString() + zipStr.substring(i + 3, i + 9).toString());
+                    i += 8;
+                } else {
+                    uzipStr += AsciiToString(parseInt("0x" + asc));
+                    i += 2;
+                }
+            } else {
+                uzipStr += chr;
+            }
+        }
+        return uzipStr;
+    }
+    function GetSiteId() {
+        var arr;
+        var reg = /(?:^|\?|&)sId=(.+?)(?:&|$)/;
+        arr = document.getElementsByTagName("body")[0].innerHTML.match(reg);
+        if (arr != null) {
+            return arr[1];
+        }
+        return 0;
+    }
 })();
+

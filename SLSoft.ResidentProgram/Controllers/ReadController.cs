@@ -7,6 +7,7 @@ using System.Data;
 using System.Text;
 using SLSoft.EasyORM;
 using MySql.Data.MySqlClient;
+using System.Text.RegularExpressions;
 
 namespace SLSoft.ResidentProgram.Controllers
 {
@@ -15,12 +16,13 @@ namespace SLSoft.ResidentProgram.Controllers
         //
         // GET: /Read/
 
-        public ActionResult Index()
+        public string Index()
         {
             string strJson = "";
             string sId = "";
             string startDate = "";
             string endDate = "";
+            string callback = "";
 
             if (Request.QueryString["sId"] != null && Request.QueryString["startDate"] != null && Request.QueryString["endDate"] != null)
             {
@@ -30,9 +32,8 @@ namespace SLSoft.ResidentProgram.Controllers
 
                 strJson = GetStatisticalTarget(sId,startDate,endDate,"");
             }
-
-            ViewBag.json = strJson;
-            return View();
+            callback = HttpContext.Request["callback"];
+            return callback+"(" + strJson + ")";
         }
 
         /// <summary>
@@ -51,91 +52,17 @@ namespace SLSoft.ResidentProgram.Controllers
             db = df.CreateDB("mysql");
 
             MySqlParameter[] mpara ={
-                new MySqlParameter("StatisticsSite_ID", sId),
-                new MySqlParameter("startDate", startDate),
-                new MySqlParameter("endDate",endDate)
+                new MySqlParameter("SiteID", sId),
+                new MySqlParameter("startDate", startDate+" 00:00:00"),
+                new MySqlParameter("endDate",endDate+" 23:59:59")
             };
-            DataTable dt = db.ExecProcedure("slsoft_ias_bus_p_select_flowanalysis", mpara);
+            DataTable dt = db.ExecProcedureDateSet("slsoft_ias_bus_p_select_flowanalysis", mpara).Tables[1];
 
             if (dt != null && dt.Rows.Count > 0)
             {
-                strJson = ToJson(dt);
+                strJson = Common.JsonHelper.ToJson(dt);
             }
             return strJson;
         }
-
-
-        #region Datatable转换为Json 
-        /// <summary> 
-        /// Datatable转换为Json 
-        /// </summary> 
-        /// <param name="table">Datatable对象</param> 
-        /// <returns>Json字符串</returns> 
-        public static string ToJson(DataTable dt) 
-        { 
-            StringBuilder jsonString = new StringBuilder(); 
-            jsonString.Append("["); 
-            DataRowCollection drc = dt.Rows; 
-            for (int i = 0; i < drc.Count; i++) 
-            { 
-                jsonString.Append("{"); 
-                for (int j = 0; j < dt.Columns.Count; j++) 
-                { 
-                    string strKey = dt.Columns[j].ColumnName; 
-                    string strValue = drc[i][j].ToString(); 
-                    Type type = dt.Columns[j].DataType; 
-                    jsonString.Append("\"" + strKey + "\":"); 
-                    strValue = String.Format(strValue, type); 
-                    if (j < dt.Columns.Count - 1) 
-                    { 
-                        jsonString.Append(strValue + ","); 
-                    } 
-                    else 
-                    { 
-                        jsonString.Append(strValue); 
-                    } 
-                } 
-                jsonString.Append("},"); 
-            } 
-            jsonString.Remove(jsonString.Length - 1, 1); 
-            jsonString.Append("]"); 
-            return jsonString.ToString(); 
-        } 
-
-        /// <summary> 
-        /// DataTable转换为Json 
-        /// </summary> 
-        public static string ToJson(DataTable dt, string jsonName) 
-        { 
-            StringBuilder Json = new StringBuilder(); 
-            if (string.IsNullOrEmpty(jsonName)) jsonName = dt.TableName; 
-            Json.Append("{\"" + jsonName + "\":["); 
-            if (dt.Rows.Count > 0) 
-            { 
-                for (int i = 0; i < dt.Rows.Count; i++) 
-                { 
-                    Json.Append("{"); 
-                    for (int j = 0; j < dt.Columns.Count; j++) 
-                    { 
-                        Type type = dt.Rows[i][j].GetType(); 
-                        Json.Append("\"" + dt.Columns[j].ColumnName.ToString() + "\":" + String.Format(dt.Rows[i][j].ToString(), type)); 
-                        if (j < dt.Columns.Count - 1) 
-                        { 
-                            Json.Append(","); 
-                        } 
-                    } 
-                    Json.Append("}"); 
-                    if (i < dt.Rows.Count - 1) 
-                    { 
-                        Json.Append(","); 
-                    } 
-                } 
-            } 
-            Json.Append("]}"); 
-            return Json.ToString(); 
-        } 
-        #endregion 
-
-
     }
 }

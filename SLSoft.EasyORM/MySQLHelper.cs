@@ -43,7 +43,8 @@ namespace SLSoft.EasyORM
             if (cmdParms != null)
             {
                 foreach (MySqlParameter parm in cmdParms)
-                    cmd.Parameters.Add(parm);
+                    if (parm != null)
+                        cmd.Parameters.Add(parm);
             }
         }
         #endregion
