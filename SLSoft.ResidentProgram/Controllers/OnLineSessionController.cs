@@ -35,7 +35,7 @@ namespace SLSoft.ResidentProgram.Controllers
         }
 
         /// <summary>
-        /// 获取某一天最近XX分钟的访问情况
+        /// 获取当前在线会话列表
         /// </summary>
         /// <param name="sId"></param>
         /// <param name="starTime"></param>

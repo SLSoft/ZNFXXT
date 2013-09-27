@@ -19,7 +19,7 @@ namespace SLSoft.ResidentProgram.Controllers
 {
     public class UserViewController : Controller
     {
-        //
+        // 用户视点
         // GET: /UserView/
 
         public ActionResult Index(string sId, string strUrl, string sDate)

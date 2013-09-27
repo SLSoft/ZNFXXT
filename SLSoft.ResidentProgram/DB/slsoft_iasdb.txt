@@ -1,5 +1,6 @@
--- ----------------------------
+﻿-- ----------------------------
 -- Procedure structure for `slsoft_ias_bus_p_check_isNewUV`
+-- 检测用户是否历史新的独立访客
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_check_isNewUV`;
 DELIMITER ;;
@@ -11,6 +12,7 @@ DELIMITER ;
 
 -- ----------------------------
 -- Procedure structure for `slsoft_ias_bus_p_check_isUV`
+-- 检测用户是否当天独立访客
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_check_isUV`;
 DELIMITER ;;
@@ -22,6 +24,7 @@ DELIMITER ;
 
 -- ----------------------------
 -- Procedure structure for `slsoft_ias_bus_p_insert_accesslist`
+-- 插入访问明细表
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_insert_accesslist`;
 DELIMITER ;;
@@ -116,63 +119,8 @@ end
 DELIMITER ;
 
 -- ----------------------------
--- Procedure structure for `slsoft_ias_bus_p_insert_flowanalysis`
--- ----------------------------
-DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_insert_flowanalysis`;
-DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `slsoft_ias_bus_p_insert_flowanalysis`(IN StatisticsSite_ID INT,IN StatisticsSite_Code varchar(512),IN TimeZone int,IN PV int,IN UV int,IN IP int,IN NewUV varchar(256),IN Session int,IN ThePerCapitaBrowsingPages int,IN AvgDepthCount varchar(256),IN AvgTimeSpent varchar(256),IN AvgOut varchar(256))
-begin
-  Insert into SLSoft_IAS_Bus_T_FlowAnalysis(
-	Code,StatisticsSite_ID,
-	StatisticsSite_Code,
-	TimeZone,
-	StatisticalDate,
-	Year,
-	Month,
-	Day,
-	Hour,
-	Minute,
-	Second,
-	PV,
-	UV,
-	IP,
-	NewUV,
-	Session,
-	ThePerCapitaBrowsingPages,
-	AvgDepthCount,
-	AvgTimeSpent,
-	AvgOut,
-	CreateTime,
-	IsValid
-	) values(
-	UUID(),
-	StatisticsSite_ID,
-	StatisticsSite_Code,
-	TimeZone,
-	now(),
-	Year(now()),
-	Month(now()),
-	Day(now()),
-	Hour(now()),
-	Minute(now()),
-	Second(now()),
-	PV,
-	UV,
-	IP,
-	NewUV,
-	Session,
-	ThePerCapitaBrowsingPages,
-	AvgDepthCount,
-	AvgTimeSpent,
-	AvgOut,
-	now(),
-	1);
-end
-;;
-DELIMITER ;
-
--- ----------------------------
 -- Procedure structure for `slsoft_ias_bus_p_insert_session`
+-- 插入访问表
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_insert_session`;
 DELIMITER ;;
@@ -268,6 +216,7 @@ DELIMITER ;
 
 -- ----------------------------
 -- Procedure structure for `slsoft_ias_bus_p_select_accesslistBySessionCode`
+-- 根据会话code查询访问明细
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_select_accesslistBySessionCode`;
 DELIMITER ;;
@@ -284,6 +233,7 @@ DELIMITER ;
 
 -- ----------------------------
 -- Procedure structure for `slsoft_ias_bus_p_select_flowanalysis`
+-- 查询趋势分析（获取指标）
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_select_flowanalysis`;
 DELIMITER ;;
@@ -292,7 +242,7 @@ begin
 set @outnum = 0;
 select @outnum:= sum(a.num) from
 ( select session_code ,count(0) as num from slsoft_ias_bus_t_accesslist
-where StatisticsSite_ID=SiteID and AccessDate between startDate and endDate
+where StatisticsSite_ID=SiteID and CreateTime between startDate and endDate
 group by session_code having count(0) = 1) as a;
 
 SELECT
@@ -302,13 +252,14 @@ round(ifnull(sum(SessionDepth)/count(distinct Session_Code),0),2) as AvgDepthCou
 round(ifnull(Sum(LengthOfPage)/count(distinct Session_Code),0),2) as AvgTimeSpent,
 round(ifnull(ifnull(@outnum,0)/count(distinct Session_Code),0),2)*100 as AvgOut
 from slsoft_ias_bus_t_accesslist
-where StatisticsSite_ID =SiteID and AccessDate between startDate and endDate;
+where StatisticsSite_ID =SiteID and CreateTime between startDate and endDate;
 end
 ;;
 DELIMITER ;
 
 -- ----------------------------
 -- Procedure structure for `slsoft_ias_bus_p_select_flowanalysisByDay`
+-- 查询趋势分析（按天统计）
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_select_flowanalysisByDay`;
 DELIMITER ;;
@@ -326,6 +277,7 @@ DELIMITER ;
 
 -- ----------------------------
 -- Procedure structure for `slsoft_ias_bus_p_select_flowanalysisByHour`
+-- 查询趋势分析（按小时统计）
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_select_flowanalysisByHour`;
 DELIMITER ;;
@@ -356,13 +308,14 @@ DELIMITER ;
 
 -- ----------------------------
 -- Procedure structure for `slsoft_ias_bus_p_select_session`
+-- 查询当前在线（会话列表）
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_select_session`;
 DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `slsoft_ias_bus_p_select_session`(IN siteID int,IN startDate varchar(64),IN endDate varchar(64))
 begin
 set @VID = 0;
-select @VID:=@VID+1 as VID,Code, time(AccessDate) as dTime,SourcePath,LastAccessPage,LengthOfSession,SessionDepth,ClientIP,Province,City,Area,NetworkAccessProvider as ISP,Language,(case when DeviceType=1 then '���ƶ��豸' else '���ƶ��豸' end) as dType,
+select @VID:=@VID+1 as VID,Code, time(AccessDate) as dTime,SourcePath,LastAccessPage,LengthOfSession,SessionDepth,ClientIP,Province,City,Area,NetworkAccessProvider as ISP,Language,(case when DeviceType=1 then '是移动设备' else '非移动设备' end) as dType,
 OperationSystem as OS,Resolution as size,Browser,BrowserEdition
 from slsoft_ias_bus_t_session
 where StatisticsSite_ID=siteID and AccessDate between startDate and endDate
@@ -373,6 +326,7 @@ DELIMITER ;
 
 -- ----------------------------
 -- Procedure structure for `slsoft_ias_bus_p_stat_AccessByHostPath`
+-- 查询受访域名明细列表
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_stat_AccessByHostPath`;
 DELIMITER ;;
@@ -392,6 +346,7 @@ DELIMITER ;
 
 -- ----------------------------
 -- Procedure structure for `slsoft_ias_bus_p_stat_AccessHost`
+-- 查询受访域名列表
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_stat_AccessHost`;
 DELIMITER ;;
@@ -411,6 +366,7 @@ DELIMITER ;
 
 -- ----------------------------
 -- Procedure structure for `slsoft_ias_bus_p_stat_AccessHostPVByDay`
+-- 查询受访域名（按天统计pv趋势图）
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_stat_AccessHostPVByDay`;
 DELIMITER ;;
@@ -447,6 +403,7 @@ DELIMITER ;
 
 -- ----------------------------
 -- Procedure structure for `slsoft_ias_bus_p_stat_AccessHostPVByHour`
+-- 查询受访域名（按小时统计pv趋势图）
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_stat_AccessHostPVByHour`;
 DELIMITER ;;
@@ -483,6 +440,7 @@ DELIMITER ;
 
 -- ----------------------------
 -- Procedure structure for `slsoft_ias_bus_p_stat_AccessHostUVByDay`
+-- 查询受访域名（按天统计uv趋势图）
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_stat_AccessHostUVByDay`;
 DELIMITER ;;
@@ -519,6 +477,7 @@ DELIMITER ;
 
 -- ----------------------------
 -- Procedure structure for `slsoft_ias_bus_p_stat_AccessHostUVByHour`
+-- 查询受访域名（按小时统计uv趋势图）
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_stat_AccessHostUVByHour`;
 DELIMITER ;;
@@ -555,6 +514,7 @@ DELIMITER ;
 
 -- ----------------------------
 -- Procedure structure for `slsoft_ias_bus_p_stat_AccessPath`
+-- 查询受访域名列表
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_stat_AccessPath`;
 DELIMITER ;;
@@ -597,6 +557,7 @@ DELIMITER ;
 
 -- ----------------------------
 -- Procedure structure for `slsoft_ias_bus_p_stat_change`
+-- 查询当前在线（最近xx分钟浏览次数、独立访客、IP数量趋势）
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_stat_change`;
 DELIMITER ;;
@@ -611,6 +572,7 @@ DELIMITER ;
 
 -- ----------------------------
 -- Procedure structure for `slsoft_ias_bus_p_stat_ContrastByDay`
+-- 查询对比分析列表（按天统计）
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_stat_ContrastByDay`;
 DELIMITER ;;
@@ -629,6 +591,7 @@ DELIMITER ;
 
 -- ----------------------------
 -- Procedure structure for `slsoft_ias_bus_p_stat_maxUV`
+-- 查询当前在线（当天最大UV、最近1分钟UV）
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_stat_maxUV`;
 DELIMITER ;;
@@ -643,6 +606,7 @@ DELIMITER ;
 
 -- ----------------------------
 -- Procedure structure for `slsoft_ias_bus_p_stat_newUV`
+-- 查询当前在线（新、老访客）
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_stat_newUV`;
 DELIMITER ;;
@@ -655,12 +619,13 @@ DELIMITER ;
 
 -- ----------------------------
 -- Procedure structure for `slsoft_ias_bus_p_stat_pcDeviceType`
+-- 查询访客分析按终端类型统计列表
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_stat_pcDeviceType`;
 DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `slsoft_ias_bus_p_stat_pcDeviceType`(IN SiteID int,IN startDate varchar(64),IN endDate varchar(64))
 select DeviceType as id, 
-( case when  DeviceType=1 then '�ƶ��豸'  else '���ƶ��豸' end) as dname,
+( case when  DeviceType=1 then '移动设备'  else '非移动设备' end) as dname,
 ifnull(sum(SessionDepth),0) as pvnum,ifnull(sum(isUv=1),0) as uvnum,count(distinct  ClientIP) as ipnum,ifnull(sum(IsNewUV=1),0) as newuvnum,count(SourceClass_ID) as vnum,count(DISTINCT SourceKey) as keynum,
 round(ifnull(sum(SessionDepth)/sum(isUv=1),0),2) as avgpage,
 round(ifnull(sum(SessionDepth)/count(CODE),0),2) as avgdepth,
@@ -675,11 +640,12 @@ DELIMITER ;
 
 -- ----------------------------
 -- Procedure structure for `slsoft_ias_bus_p_stat_pcDeviceTypeIndex`
+-- 查询终端类型列表(按指标查询)
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_stat_pcDeviceTypeIndex`;
 DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `slsoft_ias_bus_p_stat_pcDeviceTypeIndex`(IN SiteID int,IN startDate varchar(64),IN endDate varchar(64),IN oType int)
-select ( case when  DeviceType=1 then '�ƶ��豸'  else '���ƶ��豸' end) as dname,
+select ( case when  DeviceType=1 then '移动设备'  else '非移动设备' end) as dname,
 cast(ELT(oType,sum(SessionDepth), sum(IsUV=1),count(distinct  ClientIP),sum(IsNewUV=1),count(code)) as char)  as num
 from slsoft_ias_bus_t_session
 where StatisticsSite_ID =SiteID and CreateTime between startDate and endDate
@@ -689,6 +655,7 @@ DELIMITER ;
 
 -- ----------------------------
 -- Procedure structure for `slsoft_ias_bus_p_stat_Province`
+-- 查询访客分析按省份统计列表
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_stat_Province`;
 DELIMITER ;;
@@ -731,6 +698,7 @@ DELIMITER ;
 
 -- ----------------------------
 -- Procedure structure for `slsoft_ias_bus_p_stat_PV`
+-- 查询当前在线（最近XX分钟浏览次数、独立访客、IP数量）
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_stat_PV`;
 DELIMITER ;;
@@ -743,6 +711,7 @@ DELIMITER ;
 
 -- ----------------------------
 -- Procedure structure for `slsoft_ias_bus_p_stat_service`
+-- 查询访客分析按运营商统计列表
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_stat_service`;
 DELIMITER ;;
@@ -757,10 +726,10 @@ ALTER TABLE temp_ser_jump CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 
 insert into temp_ser_jump
 select a.Service as pname,sum(a.num) as num from
-	( select ( case when  NetworkAccessProvider='' then '����' else NetworkAccessProvider end) as Service,session_code ,count(0) as num from slsoft_ias_bus_t_accesslist where StatisticsSite_ID = SiteID and createtime between startDate and endDate group by session_code having count(0) = 1) as a
+	( select ( case when  NetworkAccessProvider='' then '其它' else NetworkAccessProvider end) as Service,session_code ,count(0) as num from slsoft_ias_bus_t_accesslist where StatisticsSite_ID = SiteID and createtime between startDate and endDate group by session_code having count(0) = 1) as a
 group by pname;
 
-select ( case when  NetworkAccessProvider='' then '����' else NetworkAccessProvider end) as Service,
+select ( case when  NetworkAccessProvider='' then '其它' else NetworkAccessProvider end) as Service,
 ifnull(sum(SessionDepth),0) as pvnum,ifnull(sum(isUv=1),0) as uvnum,count(distinct  ClientIP) as ipnum,ifnull(sum(IsNewUV=1),0) as newuvnum,count(distinct Session_Code) as vnum,
 round(ifnull(sum(SessionDepth)/sum(isUv=1),0),2) as avgpage,
 round(ifnull(sum(SessionDepth)/count(distinct Session_Code),0),2) as avgdepth,
@@ -778,12 +747,13 @@ DELIMITER ;
 
 -- ----------------------------
 -- Procedure structure for `slsoft_ias_bus_p_stat_source`
+-- 查询按来源统计分析列表
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_stat_source`;
 DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `slsoft_ias_bus_p_stat_source`(IN SiteID int,IN startDate varchar(64),IN endDate varchar(64))
 select SourceClass_ID as sid, 
-( case when  SourceClass_ID=1 then 'ֱ��������ַ����ǩ'  when SourceClass_ID=2 then '��������' when SourceClass_ID=3 then '�ڲ�����'  when SourceClass_ID=4 then '�ⲿ����'  else '����' end) as sname,
+( case when  SourceClass_ID=1 then '直接输入网址或书签'  when SourceClass_ID=2 then '搜索引擎' when SourceClass_ID=3 then '内部链接'  when SourceClass_ID=4 then '外部链接'  else '其它' end) as sname,
 ifnull(sum(SessionDepth),0) as pvnum,ifnull(sum(isUv=1),0) as uvnum,count(distinct  ClientIP) as ipnum,ifnull(sum(IsNewUV=1),0) as newuvnum,count(SourceClass_ID) as vnum,count(DISTINCT SourceKey) as keynum,
 round(ifnull(sum(SessionDepth)/sum(isUv=1),0),2) as avgpage,
 round(ifnull(sum(SessionDepth)/count(CODE),0),2) as avgdepth,
@@ -798,6 +768,7 @@ DELIMITER ;
 
 -- ----------------------------
 -- Procedure structure for `slsoft_ias_bus_p_stat_sourceByCode`
+-- 根据搜索引擎查看搜索词列表
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_stat_sourceByCode`;
 DELIMITER ;;
@@ -812,6 +783,7 @@ DELIMITER ;
 
 -- ----------------------------
 -- Procedure structure for `slsoft_ias_bus_p_stat_sourceByDay`
+-- 查询来源类别 按天统计指标数
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_stat_sourceByDay`;
 DELIMITER ;;
@@ -826,6 +798,7 @@ DELIMITER ;
 
 -- ----------------------------
 -- Procedure structure for `slsoft_ias_bus_p_stat_sourceByHostPath`
+-- 查询来源域名 按小时统计指标数
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_stat_sourceByHostPath`;
 DELIMITER ;;
@@ -849,6 +822,7 @@ DELIMITER ;
 
 -- ----------------------------
 -- Procedure structure for `slsoft_ias_bus_p_stat_sourceByHour`
+-- 查询来源类别 按小时统计指标数
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_stat_sourceByHour`;
 DELIMITER ;;
@@ -863,6 +837,7 @@ DELIMITER ;
 
 -- ----------------------------
 -- Procedure structure for `slsoft_ias_bus_p_stat_sourceCode`
+-- 查询搜索引擎统计列表
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_stat_sourceCode`;
 DELIMITER ;;
@@ -884,6 +859,7 @@ DELIMITER ;
 
 -- ----------------------------
 -- Procedure structure for `slsoft_ias_bus_p_stat_sourceCodeByDay`
+-- 查询搜索引擎 按天统计指标数
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_stat_sourceCodeByDay`;
 DELIMITER ;;
@@ -898,6 +874,7 @@ DELIMITER ;
 
 -- ----------------------------
 -- Procedure structure for `slsoft_ias_bus_p_stat_sourceCodeByHour`
+-- 查询搜索引擎 按小时统计指标数
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_stat_sourceCodeByHour`;
 DELIMITER ;;
@@ -912,6 +889,7 @@ DELIMITER ;
 
 -- ----------------------------
 -- Procedure structure for `slsoft_ias_bus_p_stat_SourceHostCountByDay`
+-- 查询来源域名 按天统计指标数
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_stat_SourceHostCountByDay`;
 DELIMITER ;;
@@ -948,6 +926,7 @@ DELIMITER ;
 
 -- ----------------------------
 -- Procedure structure for `slsoft_ias_bus_p_stat_SourceHostCountByHour`
+-- 查询来源域名 按小时统计指标数
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_stat_SourceHostCountByHour`;
 DELIMITER ;;
@@ -984,6 +963,7 @@ DELIMITER ;
 
 -- ----------------------------
 -- Procedure structure for `slsoft_ias_bus_p_stat_sourceHostPath`
+-- 查询来路域名明细列表
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_stat_sourceHostPath`;
 DELIMITER ;;
@@ -1006,6 +986,7 @@ DELIMITER ;
 
 -- ----------------------------
 -- Procedure structure for `slsoft_ias_bus_p_stat_SourceHostPVByDay`
+-- 查询来路域名 按每天统计指标数
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_stat_SourceHostPVByDay`;
 DELIMITER ;;
@@ -1042,6 +1023,7 @@ DELIMITER ;
 
 -- ----------------------------
 -- Procedure structure for `slsoft_ias_bus_p_stat_SourceHostPVByHour`
+-- 查询来路域名 按小时统计指标数
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_stat_SourceHostPVByHour`;
 DELIMITER ;;
@@ -1078,6 +1060,7 @@ DELIMITER ;
 
 -- ----------------------------
 -- Procedure structure for `slsoft_ias_bus_p_stat_sourceKey`
+-- 查询搜索词统计列表
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_stat_sourceKey`;
 DELIMITER ;;
@@ -1098,6 +1081,7 @@ DELIMITER ;
 
 -- ----------------------------
 -- Procedure structure for `slsoft_ias_bus_p_stat_timing`
+-- 按每分钟统计插入数据到统计表
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_stat_timing`;
 DELIMITER ;;
@@ -1171,6 +1155,7 @@ DELIMITER ;
 
 -- ----------------------------
 -- Procedure structure for `slsoft_ias_bus_p_stat_userView1`
+-- 查询当前页面访问总pv数
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_stat_userView1`;
 DELIMITER ;;
@@ -1183,6 +1168,7 @@ DELIMITER ;
 
 -- ----------------------------
 -- Procedure structure for `slsoft_ias_bus_p_stat_userView2`
+-- 查询受访页面的pv、uv数
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_stat_userView2`;
 DELIMITER ;;
@@ -1197,6 +1183,7 @@ DELIMITER ;
 
 -- ----------------------------
 -- Procedure structure for `slsoft_ias_bus_p_timing_siteid_10`
+-- 按每分钟统计站点数据插入到统计表
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_timing_siteid_10`;
 DELIMITER ;;
@@ -1257,6 +1244,7 @@ DELIMITER ;
 
 -- ----------------------------
 -- Procedure structure for `slsoft_ias_bus_p_timing_siteid_7`
+-- 按每分钟统计站点数据插入到统计表
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_timing_siteid_7`;
 DELIMITER ;;
@@ -1317,6 +1305,7 @@ DELIMITER ;
 
 -- ----------------------------
 -- Procedure structure for `slsoft_ias_bus_p_update_accesslist`
+-- 修改访问明细表
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_update_accesslist`;
 DELIMITER ;;
@@ -1334,6 +1323,7 @@ DELIMITER ;
 
 -- ----------------------------
 -- Procedure structure for `slsoft_ias_bus_p_update_session`
+-- 修改访问表
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `slsoft_ias_bus_p_update_session`;
 DELIMITER ;;
@@ -1341,98 +1331,5 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `slsoft_ias_bus_p_update_session`(IN
 update slsoft_ias_bus_t_session
   set lastAccessPage=LastAccessPage,LastBrowsingTime=AccessDate,LengthOfSession=LengthOfSession+ TIMESTAMPDIFF(SECOND,AccessDate,now()),SessionDepth=SessionDepth+1,AccessDate=now()
   where code=CONVERT(SessionCode USING utf8) COLLATE utf8_unicode_ci
-;;
-DELIMITER ;
-
--- ----------------------------
--- Procedure structure for `test`
--- ----------------------------
-DROP PROCEDURE IF EXISTS `test`;
-DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `test`()
-begin
-set @time = '';
-set @starttime = '';
-set @endtime = '';
-select @time:=concat(date(now()),' ',hour(now()),':',minute(now())-1);
-select @starttime:= concat(@time,':00');
-select @endtime:=concat(@time,':59');
-
-set @outnum = 0;
-select @outnum:= sum(a.num) from
-( select session_code ,count(0) as num from slsoft_ias_bus_t_accesslist
-where StatisticsSite_ID=1 and AccessDate between @starttime and @endtime
-group by session_code having count(0) = 1) as a;
-
-  Insert into SLSoft_IAS_Bus_T_FlowAnalysis(
-	Code,StatisticsSite_ID,
-	StatisticsSite_Code,
-	TimeZone,
-	StatisticalDate,
-	Year,
-	Month,
-	Day,
-	Hour,
-	Minute,
-	Second,
-	PV,
-	UV,
-	IP,
-	NewUV,
-	Session,
-	ThePerCapitaBrowsingPages,
-	AvgDepthCount,
-	AvgTimeSpent,
-	AvgOut,
-	CreateTime,
-	IsValid
-	)
-select UUID() as Code, 1 as StatisticsSite_ID,'' as StatisticsSite_Code,8 as TimeZone,now() as StatisticalDate,Year(now()) as Year,Month(now()) as Month,Day(now()) as Day,Hour(now()) as Hour,Minute(now())-1 as Minute,0 as Second,
-ifnull(sum(SessionDepth),0) as PV,ifnull(sum(isUv=1),0) as UV,count(distinct  ClientIP) as IP,ifnull(sum(IsNewUV=1),0) as NewUV,count(distinct Session_Code) as Session,
-round(ifnull(sum(SessionDepth)/sum(isUv=1),0),2) as ThePerCapitaBrowsingPages,
-round(ifnull(sum(SessionDepth)/count(distinct Session_Code),0),2) as AvgDepthCount,
-round(ifnull(Sum(LengthOfPage)/count(distinct Session_Code),0),2) as AvgTimeSpent,
-round(ifnull(ifnull(@outnum,0)/count(distinct Session_Code),0),2)*100 as AvgOut,now() as CreateTime,1 as IsValid
-from slsoft_ias_bus_t_accesslist
-where StatisticsSite_ID =1 and AccessDate between @starttime and @endtime;
-end
-;;
-DELIMITER ;
-
--- ----------------------------
--- Procedure structure for `_Navicat_Temp_Stored_Proc`
--- ----------------------------
-DROP PROCEDURE IF EXISTS `_Navicat_Temp_Stored_Proc`;
-DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `_Navicat_Temp_Stored_Proc`(IN StatisticsSite_ID int,IN startDate varchar(64),IN endDate varchar(64))
-set @outnum = 0
-;;
-DELIMITER ;
-
--- ----------------------------
--- Function structure for `f_getHostPath`
--- ----------------------------
-DROP FUNCTION IF EXISTS `f_getHostPath`;
-DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` FUNCTION `f_getHostPath`(HostPath varchar(500)) RETURNS varchar(128) CHARSET utf8
-BEGIN
-	DECLARE str VARCHAR(128);
-  SET str = SUBSTRING_INDEX (SUBSTRING_INDEX(HostPath , '/' , 3),'/',-1);
-	RETURN str;
-END
-;;
-DELIMITER ;
-
--- ----------------------------
--- Function structure for `slsoft_ias_bus_f_getHostPath`
--- ----------------------------
-DROP FUNCTION IF EXISTS `slsoft_ias_bus_f_getHostPath`;
-DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` FUNCTION `slsoft_ias_bus_f_getHostPath`(HostPath varchar(500)) RETURNS varchar(128) CHARSET latin1
-BEGIN
-	DECLARE str VARCHAR(128);
-  SET str = SUBSTRING_INDEX (SUBSTRING_INDEX(HostPath , '/' , 3),'/',-1);
-	RETURN str;
-END
 ;;
 DELIMITER ;

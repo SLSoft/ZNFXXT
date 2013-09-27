@@ -36,7 +36,7 @@ namespace SLSoft.ResidentProgram.Controllers
         }
 
         /// <summary>
-        /// 按来源引擎查看搜索词列表
+        /// 按来路域名查询明细列表
         /// </summary>
         /// <param name="sId"></param>
         /// <param name="starTime"></param>
