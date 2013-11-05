@@ -12,23 +12,17 @@ namespace SLSoft.ResidentProgram.Controllers
 {
     public class ContrastByHourController : Controller
     {
-        //
+        // 对比分析 (按小时统计)
         // GET: /ContrastByHour/
 
-        public string Index()
+        public string Index(string sId,string startDate,string endDate,string beginDate,string overDate)
         {
             string strJson = "";
 
-            if (Request.QueryString["sId"] != null && Request.QueryString["startDate"] != null && Request.QueryString["endDate"] != null && Request.QueryString["beginDate"] != null && Request.QueryString["overDate"] != null)
+            if (!string.IsNullOrEmpty(sId) && !string.IsNullOrEmpty(startDate) && !string.IsNullOrEmpty(endDate) && !string.IsNullOrEmpty(beginDate) && !string.IsNullOrEmpty(overDate))
             {
-                string sId = Request.QueryString["sId"].ToString();
-                string startDate = Request.QueryString["startDate"].ToString();
-                string endDate = Request.QueryString["endDate"].ToString();
-                string beginDate = Request.QueryString["beginDate"].ToString();
-                string overDate = Request.QueryString["overDate"].ToString();
-
-                DataTable dt = GetList(sId, startDate, endDate);
-                DataTable dtCon = GetList(sId, beginDate, overDate);
+                DataTable dt = GetList(sId, startDate, endDate);//今天
+                DataTable dtCon = GetList(sId, beginDate, overDate);//对比日期
 
                 if (dt != null && dtCon != null)
                 {
@@ -39,6 +33,13 @@ namespace SLSoft.ResidentProgram.Controllers
             return callback + "(" + strJson + ")";
         }
 
+        /// <summary>
+        /// 获取每小时统计数据
+        /// </summary>
+        /// <param name="sId"></param>
+        /// <param name="startDate"></param>
+        /// <param name="endDate"></param>
+        /// <returns></returns>
         private DataTable GetList(string sId, string startDate, string endDate)
         {
             DBFactory df = new DBFactory();
@@ -47,26 +48,33 @@ namespace SLSoft.ResidentProgram.Controllers
 
             MySqlParameter[] mpara ={
                 new MySqlParameter("SiteID", sId),
-                new MySqlParameter("startDate", startDate+" 00:00:00"),
-                new MySqlParameter("endDate",endDate+" 23:59:59")
+                new MySqlParameter("startDate", startDate),
+                new MySqlParameter("endDate",endDate)
             };
-            return db.ExecProcedure("slsoft_ias_bus_p_select_flowanalysisByHour", mpara);
+            return db.ExecProcedure("slsoft_ias_bus_p_stat_day_TrendHour", mpara);
         }
 
+        #region 将对比的数据拼接为一个结果集
+        /// <summary>
+        /// 将对比的数据拼接为一个结果集
+        /// </summary>
+        /// <param name="dt1"></param>
+        /// <param name="dt2"></param>
+        /// <returns></returns>
         private DataTable UniteDataTable(DataTable dt1, DataTable dt2)
         {
-            DataTable dt3 = dt1.Clone();
+            DataTable dt3 = dt1.Clone();//克隆dt1表结构
 
             for (int i = 1; i < dt2.Columns.Count; i++)
             {
-                dt3.Columns.Add("C"+dt2.Columns[i].ColumnName);
+                dt3.Columns.Add("C"+dt2.Columns[i].ColumnName); //将dt2表结构添加到dt3
             }
             object[] obj = new object[dt3.Columns.Count];
 
             for (int i = 0; i < dt1.Rows.Count; i++)
             {
                 dt1.Rows[i].ItemArray.CopyTo(obj, 0);
-                dt3.Rows.Add(obj);
+                dt3.Rows.Add(obj);//将dt1数据添加到dt3
             }
 
             if (dt1.Rows.Count >= dt2.Rows.Count)
@@ -81,13 +89,13 @@ namespace SLSoft.ResidentProgram.Controllers
             }
             else
             {
-                DataRow dr3;
-                for (int i = 0; i < dt2.Rows.Count - dt1.Rows.Count; i++)
-                {
-                    dr3 = dt3.NewRow();
-                    dt3.Rows.Add(dr3);
-                }
-                for (int i = 0; i < dt2.Rows.Count; i++)
+                //DataRow dr3;
+                //for (int i = 0; i < dt2.Rows.Count - dt1.Rows.Count; i++)
+                //{
+                //    dr3 = dt3.NewRow();
+                //    dt3.Rows.Add(dr3);
+                //}
+                for (int i = 0; i < dt1.Rows.Count; i++)
                 {
                     for (int j = 1; j < dt2.Columns.Count; j++)
                     {
@@ -97,5 +105,6 @@ namespace SLSoft.ResidentProgram.Controllers
             }
             return dt3;
         }
+        #endregion
     }
 }

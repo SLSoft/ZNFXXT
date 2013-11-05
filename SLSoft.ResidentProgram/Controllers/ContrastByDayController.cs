@@ -12,21 +12,15 @@ namespace SLSoft.ResidentProgram.Controllers
 {
     public class ContrastByDayController : Controller
     {
-        //
+        // 对比分析 (按天统计)
         // GET: /ContrastByDay/
 
-        public string Index()
+        public string Index(string sId, string startDate, string endDate, string beginDate, string overDate)
         {
             string strJson = "";
 
-            if (Request.QueryString["sId"] != null && Request.QueryString["startDate"] != null && Request.QueryString["endDate"] != null && Request.QueryString["beginDate"] != null && Request.QueryString["overDate"] != null)
+            if (!string.IsNullOrEmpty(sId) && !string.IsNullOrEmpty(startDate) && !string.IsNullOrEmpty(endDate) && !string.IsNullOrEmpty(beginDate) && !string.IsNullOrEmpty(overDate))
             {
-                string sId = Request.QueryString["sId"].ToString();
-                string startDate = Request.QueryString["startDate"].ToString();
-                string endDate = Request.QueryString["endDate"].ToString();
-                string beginDate = Request.QueryString["beginDate"].ToString();
-                string overDate = Request.QueryString["overDate"].ToString();
-
                 DataTable dt = GetList(sId, startDate, endDate);
                 DataTable dtCon = GetList(sId, beginDate, overDate);
 
@@ -39,6 +33,13 @@ namespace SLSoft.ResidentProgram.Controllers
             return callback + "(" + strJson + ")";
         }
 
+        /// <summary>
+        /// 根据时间段获取以天为单位的数据
+        /// </summary>
+        /// <param name="sId"></param>
+        /// <param name="startDate"></param>
+        /// <param name="endDate"></param>
+        /// <returns></returns>
         private DataTable GetList(string sId, string startDate, string endDate)
         {
             DBFactory df = new DBFactory();
@@ -50,9 +51,16 @@ namespace SLSoft.ResidentProgram.Controllers
                 new MySqlParameter("startDate", startDate),
                 new MySqlParameter("endDate",endDate)
             };
-            return db.ExecProcedure("slsoft_ias_bus_p_stat_ContrastByDay", mpara);
+            return db.ExecProcedure("slsoft_ias_bus_p_stat_day_Contrast", mpara);
         }
 
+        #region 将对比的数据拼接为一个结果集
+        /// <summary>
+        /// 将对比的数据拼接为一个结果集
+        /// </summary>
+        /// <param name="dt1"></param>
+        /// <param name="dt2"></param>
+        /// <returns></returns>
         private DataTable UniteDataTable(DataTable dt1, DataTable dt2)
         {
             DataTable dt3 = dt1.Clone();
@@ -110,6 +118,6 @@ namespace SLSoft.ResidentProgram.Controllers
             }
             return dt3;
         }
-
+        #endregion
     }
 }

@@ -11,26 +11,18 @@ namespace SLSoft.ResidentProgram.Controllers
 {
     public class StatSourceCodeController : Controller
     {
-        //
+        // 来源分析--搜索引擎统计
         // GET: /StatSourceCode/
 
-        public string Index()
+        public string Index(string sId, string startDate, string endDate)
         {
             string strJson = "";
-            string sId = "";
-            string startDate = "";
-            string endDate = "";
-            string callback = "";
 
-            if (Request.QueryString["sId"] != null && Request.QueryString["startDate"] != null && Request.QueryString["endDate"] != null)
+            if (!string.IsNullOrEmpty(sId) && !string.IsNullOrEmpty(startDate) && !string.IsNullOrEmpty(endDate))
             {
-                sId = Request.QueryString["sId"].ToString();
-                startDate = Request.QueryString["startDate"].ToString();
-                endDate = Request.QueryString["endDate"].ToString();
-
                 strJson = GetList(sId, startDate, endDate);
             }
-            callback = HttpContext.Request["callback"];
+            string callback = HttpContext.Request["callback"];
             return callback + "(" + strJson + ")";
         }
 

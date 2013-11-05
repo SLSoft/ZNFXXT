@@ -12,7 +12,7 @@ namespace SLSoft.ResidentProgram.Controllers
 {
     public class StatAccessIndexController : Controller
     {
-        //
+        // 受访分析--受访域名（按小时、天统计pv、count趋势图）
         // GET: /StatAccessIndex/
 
         static string startDate = "";
@@ -23,7 +23,6 @@ namespace SLSoft.ResidentProgram.Controllers
             string strJson = "";
             string sId = "";
             string type = "";
-            string callback = "";
 
             if (Request.QueryString["sId"] != null && Request.QueryString["startDate"] != null && Request.QueryString["endDate"] != null && Request.QueryString["type"] != null)
             {
@@ -34,10 +33,11 @@ namespace SLSoft.ResidentProgram.Controllers
 
                 strJson = GetList(sId, startDate, endDate, type);
             }
-            callback = HttpContext.Request["Callback"];
+            string callback = HttpContext.Request["Callback"];
             return callback + "(" + strJson + ")";
         }
 
+        #region 按受访页面统计 每小时、每天指标数
         /// <summary>
         /// 按受访页面统计 每小时、每天指标数
         /// </summary>
@@ -58,41 +58,62 @@ namespace SLSoft.ResidentProgram.Controllers
                 new MySqlParameter("endDate",endDate+" 23:59:59")
             };
             DataSet ds = null;
-            if (startDate == endDate)//按小时
+            if (startDate == DateTime.Now.Date.ToString("yyyy-MM-dd"))//当天按小时统计
             {
-                switch (type.ToLower())
+                switch (type)
                 {
                     case "pv":
-                        ds = db.ExecProcedureDateSet("slsoft_ias_bus_p_stat_AccessHostPVByHour", mpara);
+                        ds = db.ExecProcedureDateSet("slsoft_ias_bus_p_stat_day_AccessHostPVHour", mpara);
                         break;
                     case "uv":
-                        ds = db.ExecProcedureDateSet("slsoft_ias_bus_p_stat_AccessHostUVByHour",mpara);
+                        ds = db.ExecProcedureDateSet("slsoft_ias_bus_p_stat_day_AccessHostUVHour", mpara);
                         break;
                 }
-                if (ds != null && ds.Tables.Count > 0)
+            }
+            else//历史
+            {
+                if (startDate == endDate)//时间段为一天按小时统计
+                {
+                    switch (type)
+                    {
+                        case "pv":
+                            ds = db.ExecProcedureDateSet("slsoft_ias_bus_p_stat_his_AccessHostPVHour", mpara);
+                            break;
+                        case "uv":
+                            ds = db.ExecProcedureDateSet("slsoft_ias_bus_p_stat_his_AccessHostUVHour", mpara);
+                            break;
+                    }
+                }
+                else//按天统计
+                {
+                    switch (type)
+                    {
+                        case "pv":
+                            ds = db.ExecProcedureDateSet("slsoft_ias_bus_p_stat_his_AccessHostPV", mpara);
+                            break;
+                        case "uv":
+                            ds = db.ExecProcedureDateSet("slsoft_ias_bus_p_stat_his_AccessHostUV", mpara);
+                            break;
+                    }
+                }
+            }
+
+            if (ds != null && ds.Tables.Count > 0)
+            {
+                if (startDate == endDate)
                 {
                     strJson = ToJson(ds);
                 }
-            }
-            else
-            {
-                switch (type.ToLower())
-                {
-                    case "pv":
-                        ds = db.ExecProcedureDateSet("slsoft_ias_bus_p_stat_AccessHostPVByDay", mpara);
-                        break;
-                    case "uv":
-                        ds = db.ExecProcedureDateSet("slsoft_ias_bus_p_stat_AccessHostUVByDay", mpara);
-                        break;
-                }
-                if (ds != null && ds.Tables.Count > 0)
+                else
                 {
                     strJson = ToJson_day(ds);
                 }
             }
             return strJson;
         }
+        #endregion
 
+        #region 将数据转换为定制的json格式
         public static string ToJson(DataSet ds)
         {
             DataTable dt1 = ds.Tables[0];
@@ -181,7 +202,9 @@ namespace SLSoft.ResidentProgram.Controllers
             jsonString.Append("]");
             return jsonString.ToString();
         }
+        #endregion
 
+        #region 获取时间段日期
         private static List<string> GetDays()
         {
             List<string> date = new List<string>();
@@ -196,5 +219,6 @@ namespace SLSoft.ResidentProgram.Controllers
             }
             return date;
         }
+        #endregion
     }
 }

@@ -71,13 +71,17 @@ namespace SLSoft.ResidentProgram.Controllers
             AbstractDB db = null;
             DataTable dt = null;
             db = df.CreateDB("mysql");
-
+            
+            object locker = new object();
             Cache _cache = HttpRuntime.Cache;
 
             if (_cache["slsoft_t_IP"] == null)
             {
-                dt = db.ExecSql("select * from slsoft_ias_bus_t_ip");
-                _cache.Insert("slsoft_t_IP", dt, null, new DateTime(2099, 12, 31), TimeSpan.Zero);
+                lock (locker)
+                {
+                    dt = db.ExecSql("select * from slsoft_ias_bus_t_ip");
+                    _cache.Insert("slsoft_t_IP", dt, null, new DateTime(2099, 12, 31), TimeSpan.Zero);
+                }
             }
             else
             {

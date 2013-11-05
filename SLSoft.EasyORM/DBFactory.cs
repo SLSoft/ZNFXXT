@@ -28,7 +28,7 @@ namespace SLSoft.EasyORM
                     node = xml.SelectSingleNode("database[@modle='single']");
                     xnl = getList(node);
 
-                    strConn = string.Format("Server={0};Uid={1};Pwd={2};Database={3};", xnl.Item(1).InnerText, xnl.Item(2).InnerText, xnl.Item(3).InnerText, xnl.Item(4).InnerText);
+                    strConn = string.Format("Server={0};Uid={1};Pwd={2};Database={3};Pooling=true;Min Pool Size=20;Max Pool Size=200;Connection LifeTime=30;", xnl.Item(1).InnerText, xnl.Item(2).InnerText, xnl.Item(3).InnerText, xnl.Item(4).InnerText);
                     db = new DBMySql(strConn);
                     break;
                 case "sql":

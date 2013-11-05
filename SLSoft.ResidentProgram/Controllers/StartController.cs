@@ -76,20 +76,19 @@ namespace SLSoft.ResidentProgram.Controllers
         
         public ActionResult GetData(FormCollection fc)
         {
-            dtIP = GetTableIP();
-
             if (fc.Count == 0)
             {
                 fc = SetPostData(GetDocumentContents(Request));
             }
             Information im = FormatMessage(fc);
 
+            dtIP = GetTableIP();
             drIP = GetIPInfo(im.UserHostAddress);
             Session["drIP"] = drIP;
 
             SaveInformation(im);
 
-            return Json(new {sId = im.sId});
+            return Json(new{ });
         }
 
         //将参数设置为键值格式
@@ -151,6 +150,9 @@ namespace SLSoft.ResidentProgram.Controllers
             im.CurrentUrl = fc["cUrl"];//当前URL
             im.currentUrlTitle = fc["cUrlTitle"];//当前URL标题
             im.ParentUrl = fc["parentUrl"];//父窗口URL
+            im.ClientX = fc["clientX"];
+            im.ClientY = fc["clientY"];
+            im.UserHostAddress = fc["IP"]==""? Request.UserHostAddress:fc["IP"].ToString().Trim();//客户端IP
 
             //cookie数据
             im.UserCode = fc["userCode"].ToString();
@@ -163,7 +165,6 @@ namespace SLSoft.ResidentProgram.Controllers
 
             //服务器数据
             im.UserHostName = System.Net.Dns.GetHostName();//客户端计算机名
-            im.UserHostAddress = Request.UserHostAddress;//客户端IP
             im.ServerAddress = Request.ServerVariables["LOCAL_ADDR"];//服务器端IP
             im.JavaApplets = Request.Browser.JavaApplets;//是否支持JAVA
             im.Frames = Request.Browser.Frames;//是否支持框架网页
@@ -267,6 +268,8 @@ namespace SLSoft.ResidentProgram.Controllers
                 new MySqlParameter("DeviceType", im.IsMove=="否"?"0":"1"),
                 new MySqlParameter("AboutDevice", im.MoveType),
                 new MySqlParameter("OperationSystem", im.OS),
+                new MySqlParameter("ClientX",im.ClientX),
+                new MySqlParameter("ClientY",im.ClientY),
                 new MySqlParameter("Resolution", im.Size),
                 new MySqlParameter("Color", im.VColor),
                 new MySqlParameter("UserAgent", Request.UserAgent),

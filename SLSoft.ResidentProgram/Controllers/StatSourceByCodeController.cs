@@ -12,26 +12,18 @@ namespace SLSoft.ResidentProgram.Controllers
 {
     public class StatSourceByCodeController : Controller
     {
-        //
+        // 搜索引擎（根据搜索引擎查看搜索词列表）
         // GET: /StatSourceByCode/
 
-        public string Index()
+        public string Index(string sId,string sCode,string startDate,string endDate)
         {
             string strJson = "";
-            string sCode = "";
-            string startDate = "";
-            string endDate = "";
-            string callback = "";
 
-            if (Request.QueryString["sCode"] != null && Request.QueryString["startDate"] != null && Request.QueryString["endDate"] != null)
+            if (!string.IsNullOrEmpty(sId) && !string.IsNullOrEmpty(sCode) && !string.IsNullOrEmpty(startDate) && !string.IsNullOrEmpty(endDate))
             {
-                sCode = Request.QueryString["sCode"].ToString();
-                startDate = Request.QueryString["startDate"].ToString();
-                endDate = Request.QueryString["endDate"].ToString();
-
-                strJson = GetList(sCode, startDate, endDate);
+                strJson = GetList(sId,sCode, startDate, endDate);
             }
-            callback = HttpContext.Request["Callback"];
+            string callback = HttpContext.Request["Callback"];
             return callback + "(" + strJson + ")";
         }
 
@@ -42,7 +34,7 @@ namespace SLSoft.ResidentProgram.Controllers
         /// <param name="starTime"></param>
         /// <param name="endTime"></param>
         /// <returns></returns>
-        private string GetList(string sCode, string startDate, string endDate)
+        private string GetList(string sId,string sCode, string startDate, string endDate)
         {
             string strJson = "";
             DBFactory df = new DBFactory();
@@ -50,11 +42,21 @@ namespace SLSoft.ResidentProgram.Controllers
             db = df.CreateDB("mysql");
 
             MySqlParameter[] mpara ={
+                new MySqlParameter("SiteID",sId),                           
                 new MySqlParameter("SourceCode", sCode),
                 new MySqlParameter("startDate", startDate+" 00:00:00"),
                 new MySqlParameter("endDate",endDate+" 23:59:59")
             };
-            DataTable dt = db.ExecProcedure("slsoft_ias_bus_p_stat_sourceByCode", mpara);
+            DataTable dt = null;
+
+            if (startDate == DateTime.Now.Date.ToString("yyyy-MM-dd"))
+            {
+                dt = db.ExecProcedure("slsoft_ias_bus_p_stat_day_SourceByCode", mpara);
+            }
+            else
+            {
+                dt = db.ExecProcedure("slsoft_ias_bus_p_stat_his_SourceByCode", mpara);
+            }
 
             if (dt != null && dt.Rows.Count > 0)
             {
@@ -62,6 +64,5 @@ namespace SLSoft.ResidentProgram.Controllers
             }
             return strJson;
         }
-
     }
 }

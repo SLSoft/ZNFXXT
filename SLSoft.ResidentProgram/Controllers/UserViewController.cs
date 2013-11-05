@@ -35,20 +35,20 @@ namespace SLSoft.ResidentProgram.Controllers
             doc.Body.Prepend("<div id='layoutdiv'></div>");
             foreach (Element eb in bg)
             {
-                eb.Attr("background", host + eb.Attr("background"));
+                eb.Attr("background", host + setURL(eb.Attr("background")));
             }
             foreach (Element ei in imports)
             {
                 if (ei.Attr("href").IndexOf("http") < 0)
                 {
-                    ei.Attr("href", host + ei.Attr("href"));
+                    ei.Attr("href", host +setURL(ei.Attr("href")));
                 }
             }
             foreach (Element em in media)
             {
                 if (em.Attr("src").IndexOf("http") < 0)
                 {
-                    em.Attr("src", host + em.Attr("src"));
+                    em.Attr("src", host + setURL(em.Attr("src")));
                 }
             }
 
@@ -65,34 +65,33 @@ namespace SLSoft.ResidentProgram.Controllers
             {
                 if (el.Attr("href").IndexOf("http") < 0)
                 {
-                    el.Attr("href", host + el.Attr("href"));
-
-                    DataRow[] dr = dt.Select("path='"+el.Attr("href")+"'");
-
-                    if (dr.Count() > 0)
-                    {
-                        if (int.Parse(dr[0]["pvnum"].ToString()) > max)
-                        {
-                            max = int.Parse(dr[0]["pvnum"].ToString());
-                        }
-                       
-                        el.Attr("pv", dr[0]["pvnum"].ToString());
-                        el.Attr("uv", dr[0]["uvnum"].ToString());
-
-                        float avgpv = (float.Parse(dr[0]["pvnum"].ToString())/float.Parse(pvnum.ToString()))*100;
-                        el.Attr("pec", avgpv.ToString("0.000")+"%");
-                    }
-                    
-                    el.Attr("class", "linknode");
+                    el.Attr("href", host + setURL(el.Attr("href")));
                 }
+                DataRow[] dr = dt.Select("path='" + el.Attr("href") + "'");
+
+                if (dr.Count() > 0)
+                {
+                    if (int.Parse(dr[0]["pvnum"].ToString()) > max)
+                    {
+                        max = int.Parse(dr[0]["pvnum"].ToString());
+                    }
+
+                    el.Attr("pv", dr[0]["pvnum"].ToString());
+                    el.Attr("uv", dr[0]["uvnum"].ToString());
+
+                    float avgpv = (float.Parse(dr[0]["pvnum"].ToString()) / float.Parse(pvnum.ToString())) * 100;
+                    el.Attr("pec", avgpv.ToString("0.000") + "%");
+                }
+
+                el.Attr("class", "linknode");
             }
             
             Element lodiv = doc.Select("#layoutdiv").First();
             lodiv.Attr("max", max.ToString());
             
             doc.Head.Append("<script src='../../Scripts/jquery-1.5.1.min.js' type='text/javascript'></script>");
-            doc.Head.Append("<script src='../../Scripts/jquery-powerFloat-min.js' type='text/javascript'></script>");
-            doc.Head.Append("<link href='../../Content/powerFloat.css' rel='stylesheet' type='text/css' />");
+            doc.Head.Append("<script src='../../Scripts/jquery.tipTip.minified.js' type='text/javascript'></script>");
+            doc.Head.Append("<link href='../../Content/tipTip.css' rel='stylesheet' type='text/css' />");
 
             return Json(doc.OuterHtml(), JsonRequestBehavior.AllowGet);
         }
@@ -113,6 +112,21 @@ namespace SLSoft.ResidentProgram.Controllers
                 s = match.ToString();
             }
             return s;
+        }
+
+        private string setURL(string url)
+        {
+            string newurl = "";
+            newurl = url.Replace("../", "");
+            newurl = newurl.Replace("..", "");
+            if (newurl.Substring(0, 1) != "/")
+            {
+                return "/" + newurl;
+            }
+            else
+            {
+                return newurl;
+            }
         }
 
         private DataTable GetList(string sId,string path, string date)

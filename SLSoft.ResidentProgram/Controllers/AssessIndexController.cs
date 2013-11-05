@@ -9,30 +9,29 @@ using System.Data;
 
 namespace SLSoft.ResidentProgram.Controllers
 {
-    public class OnLineUVController : Controller
+    public class AssessIndexController : Controller
     {
-        // 当前在线（最近XX分钟新、老访客）
-        // GET: /OnLineUV/
+        // 消费指数评估
+        // GET: /AssessIndex/
 
-        public string Index(string sId, string iTime)
+        public string Index(string sId)
         {
             string strJson = "";
 
-            if (!string.IsNullOrEmpty(sId) && !string.IsNullOrEmpty(iTime))
+            if (!string.IsNullOrEmpty(sId))
             {
-                strJson = GetInfo(int.Parse(sId), int.Parse(iTime));
+                strJson = GetList(sId);
             }
             string callback = HttpContext.Request["callback"];
             return callback + "(" + strJson + ")";
         }
 
         /// <summary>
-        /// 获取当前在线（最近XX分钟新、老访客）
+        /// 根据站点ID获取消费指标评估数据
         /// </summary>
-        /// <param name="SiteID"></param>
-        /// <param name="IntervalTime"></param>
+        /// <param name="sId"></param>
         /// <returns></returns>
-        private string GetInfo(int SiteID, int IntervalTime)
+        private string GetList(string sId)
         {
             string strJson = "";
             DBFactory df = new DBFactory();
@@ -40,20 +39,16 @@ namespace SLSoft.ResidentProgram.Controllers
             db = df.CreateDB("mysql");
 
             MySqlParameter[] mpara ={
-                new MySqlParameter("SiteID", SiteID),
-                new MySqlParameter("IntervalTime", IntervalTime)
+                new MySqlParameter("SiteID", sId)
             };
-            DataTable dt = db.ExecProcedure("slsoft_ias_bus_p_stat_day_OnLineUV", mpara);
+            DataTable dt = db.ExecProcedureDateSet("slsoft_ias_bus_p_stat_AssessIndex", mpara).Tables[1];
 
             if (dt != null && dt.Rows.Count > 0)
             {
                 strJson = Common.JsonHelper.ToJson(dt);
             }
-            else
-            {
-                strJson = "[{NewUV:0,UV:0}]";
-            }
             return strJson;
         } 
+
     }
 }

@@ -12,28 +12,18 @@ namespace SLSoft.ResidentProgram.Controllers
 {
     public class StatSourceIndexController : Controller
     {
-        //
+        // 来源分类（统计小时/天 趋势图type指标为：pv，uv，ip，newuv，count）
         // GET: /StatSourceIndex/
 
-        public string Index()
+        public string Index(string sId,string startDate,string endDate,string type)
         {
             string strJson = "";
-            string sId = "";
-            string startDate = "";
-            string endDate = "";
-            string type = "";
-            string callback = "";
 
-            if (Request.QueryString["sId"] != null && Request.QueryString["startDate"] != null && Request.QueryString["endDate"] != null && Request.QueryString["type"] != null)
+            if (!string.IsNullOrEmpty(sId) && !string.IsNullOrEmpty(startDate) && !string.IsNullOrEmpty(endDate) && !string.IsNullOrEmpty(type))
             {
-                sId = Request.QueryString["sId"].ToString();
-                startDate = Request.QueryString["startDate"].ToString();
-                endDate = Request.QueryString["endDate"].ToString();
-                type = Request.QueryString["type"].ToString();
-
                 strJson = GetList(sId, startDate, endDate, type);
             }
-            callback = HttpContext.Request["Callback"];
+            string callback = HttpContext.Request["Callback"];
             return callback + "(" + strJson + ")";
         }
 
@@ -47,12 +37,10 @@ namespace SLSoft.ResidentProgram.Controllers
         private string GetList(string sId, string startDate, string endDate,string type)
         {
             int otype = GetType(type);
-            if (otype == 0)
-            {
-                return "";
-            }
+            if (otype == 0){return "";}
 
             string strJson = "";
+
             DBFactory df = new DBFactory();
             AbstractDB db = null;
             db = df.CreateDB("mysql");
@@ -64,25 +52,39 @@ namespace SLSoft.ResidentProgram.Controllers
                 new MySqlParameter("oType",otype)
             };
             DataTable dt = null;
-            if (startDate == endDate)
+
+            if (startDate == DateTime.Now.Date.ToString("yyyy-MM-dd"))//当天
             {
-                dt = db.ExecProcedure("slsoft_ias_bus_p_stat_sourceByHour", mpara);
+                dt = db.ExecProcedure("slsoft_ias_bus_p_stat_day_SourceTrendHour", mpara);
 
                 if (dt != null && dt.Rows.Count > 0)
                 {
                     strJson = ToJson(dt);
                 }
             }
-            else
+            else //读历史数据
             {
-                dt = db.ExecProcedure("slsoft_ias_bus_p_stat_sourceByDay",mpara);
-                if (dt != null && dt.Rows.Count > 0)
+                if (startDate == endDate) //按小时
                 {
-                    strJson = ToJson_day(dt);
+                    dt = db.ExecProcedure("slsoft_ias_bus_p_stat_his_SourceTrendHour",mpara);
+                    if (dt != null && dt.Rows.Count > 0)
+                    {
+                        strJson = ToJson(dt);
+                    }
+                }
+                else//按天数
+                {
+                    dt = db.ExecProcedure("slsoft_ias_bus_p_stat_his_SourceTrend", mpara);
+                    if (dt != null && dt.Rows.Count > 0)
+                    {
+                        strJson = ToJson_day(dt);
+                    }
                 }
             }
             return strJson;
         }
+
+        #region 将数据转换为定制的json格式
 
         public static string ToJson(DataTable dt)
         {
@@ -93,7 +95,7 @@ namespace SLSoft.ResidentProgram.Controllers
             {
                 jsonString.Append("{");
                 DataRow[] rows = dt.Select(string.Format("sourceId={0}", i));
-                jsonString.Append(string.Format("name:\"{0}\",data:[",GetSourceName(i)));
+                jsonString.Append(string.Format("name:\"{0}\",data:[", SetSourceName(i)));
 
                 List<DataRow> list = new List<DataRow>();
                 foreach (var item in rows)
@@ -132,7 +134,7 @@ namespace SLSoft.ResidentProgram.Controllers
             {
                 jsonString.Append("{");
                 DataRow[] rows = dt.Select(string.Format("sourceId={0}", i));
-                jsonString.Append(string.Format("name:\"{0}\",data:[", GetSourceName(i)));
+                jsonString.Append(string.Format("name:\"{0}\",data:[", SetSourceName(i)));
 
                 string strValue = "";
                 for (int r = 0; r < rows.Length; r++)
@@ -150,7 +152,15 @@ namespace SLSoft.ResidentProgram.Controllers
             jsonString.Append("]");
             return jsonString.ToString();
         }
+        #endregion
 
+        #region 自定义方法 返回相应的值
+
+        /// <summary>
+        /// 根据获取的指标参数返回对应的数值
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
         private static int GetType(string type)
         {
             switch (type.ToLower())
@@ -169,8 +179,12 @@ namespace SLSoft.ResidentProgram.Controllers
             return 0;
         }
 
-        //获取来源名称
-        private static string GetSourceName(int i)
+        /// <summary>
+        /// 根据来源id设置来源名称
+        /// </summary>
+        /// <param name="i"></param>
+        /// <returns></returns>
+        private static string SetSourceName(int i)
         {
             switch (i)
             {
@@ -186,5 +200,6 @@ namespace SLSoft.ResidentProgram.Controllers
                     return "其它";
             }
         }
+        #endregion
     }
 }

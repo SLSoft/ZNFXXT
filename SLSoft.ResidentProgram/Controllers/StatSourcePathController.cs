@@ -12,31 +12,23 @@ namespace SLSoft.ResidentProgram.Controllers
 {
     public class StatSourcePathController : Controller
     {
-        //
+        // 统计来路页面
         // GET: /StatSourcePath/
 
-        public string Index()
+        public string Index(string sId, string startDate, string endDate)
         {
             string strJson = "";
-            string sId = "";
-            string startDate = "";
-            string endDate = "";
-            string callback = "";
-
-            if (Request.QueryString["sId"] != null && Request.QueryString["startDate"] != null && Request.QueryString["endDate"] != null)
+   
+            if (!string.IsNullOrEmpty(sId) && !string.IsNullOrEmpty(startDate) && !string.IsNullOrEmpty(endDate))
             {
-                sId = Request.QueryString["sId"].ToString();
-                startDate = Request.QueryString["startDate"].ToString();
-                endDate = Request.QueryString["endDate"].ToString();
-
                 strJson = GetList(sId, startDate, endDate);
             }
-            callback = HttpContext.Request["Callback"];
+            string callback = HttpContext.Request["Callback"];
             return callback + "(" + strJson + ")";
         }
 
         /// <summary>
-        ///  来路域名明细列表
+        ///  来路页面列表
         /// </summary>
         /// <param name="sId"></param>
         /// <param name="starTime"></param>
@@ -55,7 +47,15 @@ namespace SLSoft.ResidentProgram.Controllers
                 new MySqlParameter("endDate",endDate+" 23:59:59"),
                 new MySqlParameter("oType",2)
             };
-            DataTable dt = db.ExecProcedure("slsoft_ias_bus_p_stat_sourceHostPath", mpara);
+            DataTable dt = null;
+            if (startDate == DateTime.Now.Date.ToString("yyyy-MM-dd"))
+            {
+                dt = db.ExecProcedure("slsoft_ias_bus_p_stat_day_SourceHost", mpara);
+            }
+            else
+            {
+                dt = db.ExecProcedure("slsoft_ias_bus_p_stat_his_SourceHost", mpara);
+            }
 
             if (dt != null && dt.Rows.Count > 0)
             {

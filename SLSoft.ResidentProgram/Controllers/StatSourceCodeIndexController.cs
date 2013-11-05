@@ -12,7 +12,7 @@ namespace SLSoft.ResidentProgram.Controllers
 {
     public class StatSourceCodeIndexController : Controller
     {
-        //
+        // 搜索引擎（按天、小时统计pv、uv、newuv、ip、count指标）
         // GET: /StatSourceCodeIndex/
         static string startDate = "";
         static string endDate = "";
@@ -47,10 +47,7 @@ namespace SLSoft.ResidentProgram.Controllers
         private string GetList(string sId, string startDate, string endDate,string type)
         {
             int otype = GetType(type);
-            if (otype == 0)
-            {
-                return "";
-            }
+            if (otype == 0){return "";}
 
             string strJson = "";
             DBFactory df = new DBFactory();
@@ -64,26 +61,40 @@ namespace SLSoft.ResidentProgram.Controllers
                 new MySqlParameter("oType",otype)
             };
             DataTable dt = null;
-            if (startDate == endDate)
+
+            if (startDate == DateTime.Now.Date.ToString("yyyy-MM-dd"))//当天
             {
-                dt = db.ExecProcedure("slsoft_ias_bus_p_stat_sourceCodeByHour", mpara);
+                dt = db.ExecProcedure("slsoft_ias_bus_p_stat_day_SourceCodeTrendHour", mpara);
 
                 if (dt != null && dt.Rows.Count > 0)
                 {
                     strJson = ToJson(dt);
                 }
             }
-            else
+            else//历史
             {
-                dt = db.ExecProcedure("slsoft_ias_bus_p_stat_sourceCodeByDay",mpara);
-                if (dt != null && dt.Rows.Count > 0)
+                if (startDate == endDate)
                 {
-                    strJson = ToJson_day(dt);
+                    dt = db.ExecProcedure("slsoft_ias_bus_p_stat_his_SourceCodeTrendHour", mpara);
+
+                    if (dt != null && dt.Rows.Count > 0)
+                    {
+                        strJson = ToJson(dt);
+                    }
+                }
+                else
+                {
+                    dt = db.ExecProcedure("slsoft_ias_bus_p_stat_his_SourceCodeTrend", mpara);
+                    if (dt != null && dt.Rows.Count > 0)
+                    {
+                        strJson = ToJson_day(dt);
+                    }
                 }
             }
             return strJson;
         }
 
+        #region 将数据转换为定制的json格式
         public static string ToJson(DataTable dt)
         {
             string[] strArray = GetSourceCode();
@@ -168,7 +179,10 @@ namespace SLSoft.ResidentProgram.Controllers
             jsonString.Append("]");
             return jsonString.ToString();
         }
+        #endregion
 
+        # region 自定义方法 返回相应的值
+        //返回操作值
         private static int GetType(string type)
         {
             switch (type.ToLower())
@@ -187,6 +201,7 @@ namespace SLSoft.ResidentProgram.Controllers
             return 0;
         }
 
+        //返回日期时间段集合
         private static List<string> GetDays()
         {
             List<string> date = new List<string>();
@@ -202,6 +217,7 @@ namespace SLSoft.ResidentProgram.Controllers
             return date;
         }
 
+        //返回搜索引擎数组
         private static string[] GetSourceCode()
         {
             string[] strArray = new string[] { "Baidu", "Google","yisou", "MSN", "Yahoo", "live", "tom"
@@ -210,5 +226,6 @@ namespace SLSoft.ResidentProgram.Controllers
 
             return strArray;
         }
+        #endregion
     }
 }

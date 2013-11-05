@@ -35,6 +35,8 @@ namespace SLSoft.ResidentProgram.Models
         public string CurrentUrl { set; get; }//当前URL
         public string currentUrlTitle { set; get; }//当前URL标题
         public string ParentUrl { set; get; }//父窗口URL
+        public string ClientX { set; get; }//X坐标
+        public string ClientY { set; get; }//Y坐标
 
         /// <summary>
         /// cookie数据

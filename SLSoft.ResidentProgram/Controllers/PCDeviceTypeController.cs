@@ -13,26 +13,18 @@ namespace SLSoft.ResidentProgram.Controllers
 {
     public class PCDeviceTypeController : Controller
     {
-        //
+        // 访客分析--终端详情
         // GET: /PCDeviceType/
 
-        public string Index()
+        public string Index(string sId, string startDate, string endDate)
         {
             string strJson = "";
-            string sId = "";
-            string startDate = "";
-            string endDate = "";
-            string callback = "";
 
-            if (Request.QueryString["sId"] != null && Request.QueryString["startDate"] != null && Request.QueryString["endDate"] != null)
+            if (!string.IsNullOrEmpty(sId) && !string.IsNullOrEmpty(startDate) && !string.IsNullOrEmpty(endDate))
             {
-                sId = Request.QueryString["sId"].ToString();
-                startDate = Request.QueryString["startDate"].ToString();
-                endDate = Request.QueryString["endDate"].ToString();
-
                 strJson = GetList(sId, startDate, endDate);
             }
-            callback = HttpContext.Request["callback"];
+            string callback = HttpContext.Request["callback"];
             return callback+"(" + strJson + ")";
         }
 
@@ -42,7 +34,6 @@ namespace SLSoft.ResidentProgram.Controllers
         /// <param name="sId"></param>
         /// <param name="starTime"></param>
         /// <param name="endTime"></param>
-        /// <param name="token"></param>
         /// <returns></returns>
         private string GetList(string sId, string startDate, string endDate)
         {
@@ -56,7 +47,16 @@ namespace SLSoft.ResidentProgram.Controllers
                 new MySqlParameter("startDate", startDate+" 00:00:00"),
                 new MySqlParameter("endDate",endDate+" 23:59:59")
             };
-            DataTable dt = db.ExecProcedure("slsoft_ias_bus_p_stat_pcDeviceType", mpara);
+            DataTable dt = null;
+
+            if (startDate == DateTime.Now.Date.ToString("yyyy-MM-dd"))
+            {
+                dt = db.ExecProcedure("slsoft_ias_bus_p_stat_day_PCType", mpara);
+            }
+            else
+            {
+                dt = db.ExecProcedure("slsoft_ias_bus_p_stat_his_PCType", mpara);
+            }
 
             if (dt != null && dt.Rows.Count > 0)
             {

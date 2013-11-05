@@ -11,21 +11,16 @@ namespace SLSoft.ResidentProgram.Controllers
 {
     public class OnLineChangeController : Controller
     {
-        //
+        // 当前在线（最近xx分钟浏览次数、独立访客、IP数量趋势）
         // GET: /OnLineChange/
 
-        public string Index()
+        public string Index(string sId, string iTime)
         {
             string strJson = "";
-            int SiteID = 0;
-            int IntervalTime = 0;
 
-            if (Request.QueryString["sId"] != null && Request.QueryString["iTime"] != null)
+            if (!string.IsNullOrEmpty(sId) && !string.IsNullOrEmpty(iTime))
             {
-                SiteID = int.Parse(Request.QueryString["sId"].ToString());
-                IntervalTime = int.Parse(Request.QueryString["iTime"]);
-
-                strJson = GetList(SiteID, IntervalTime);
+                strJson = GetList(sId, iTime);
             }
             string callback = HttpContext.Request["callback"];
             return callback + "(" + strJson + ")";
@@ -37,7 +32,7 @@ namespace SLSoft.ResidentProgram.Controllers
         /// <param name="SiteID"></param>
         /// <param name="IntervalTime"></param>
         /// <returns></returns>
-        private string GetList(int SiteID, int IntervalTime)
+        private string GetList(string SiteID, string IntervalTime)
         {
             string strJson = "";
             DBFactory df = new DBFactory();
@@ -48,7 +43,7 @@ namespace SLSoft.ResidentProgram.Controllers
                 new MySqlParameter("SiteID", SiteID),
                 new MySqlParameter("IntervalTime", IntervalTime)
             };
-            DataTable dt = db.ExecProcedure("slsoft_ias_bus_p_stat_change", mpara);
+            DataTable dt = db.ExecProcedure("slsoft_ias_bus_p_stat_day_OnLineChange", mpara);
 
             if (dt != null && dt.Rows.Count > 0)
             {

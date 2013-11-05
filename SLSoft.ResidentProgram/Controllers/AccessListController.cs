@@ -11,22 +11,18 @@ namespace SLSoft.ResidentProgram.Controllers
 {
     public class AccessListController : Controller
     {
-        //
+        // 根据会话code查看访问明细
         // GET: /AccessList/
 
-        public string Index()
+        public string Index(string sCode,string sDate)
         {
             string strJson = "";
-            string sessionCode = "";
-            string callback = "";
 
-            if (Request.QueryString["sCode"] != null)
+            if (!string.IsNullOrEmpty(sCode) && !string.IsNullOrEmpty(sDate))
             {
-                sessionCode = Request.QueryString["sCode"].ToString();
-
-                strJson = GetAccessList(sessionCode);
+                strJson = GetAccessList(sCode,sDate);
             }
-            callback = HttpContext.Request["callback"];
+            string callback = HttpContext.Request["callback"];
             return callback + "(" + strJson + ")";
         }
 
@@ -35,23 +31,63 @@ namespace SLSoft.ResidentProgram.Controllers
         /// </summary>
         /// <param name="SessionCode"></param>
         /// <returns></returns>
-        private string GetAccessList(string SessionCode)
+        private string GetAccessList(string sCode,string sDate)
         {
             string strJson = "";
-            DBFactory df = new DBFactory();
-            AbstractDB db = null;
-            db = df.CreateDB("mysql");
+            DataTable dt = null;
 
-            MySqlParameter[] mpara ={
-                new MySqlParameter("SessionCode", SessionCode)
-            };
-            DataTable dt = db.ExecProcedure("slsoft_ias_bus_p_select_accesslistBySessionCode", mpara);
+            if (sDate == DateTime.Now.Date.ToString("yyyy-MM-dd"))
+            {
+                dt = GetDayList(sCode);
+            }
+            else
+            {
+                dt = GetHisList(sCode);
+            }
 
             if (dt != null && dt.Rows.Count > 0)
             {
                 strJson = Common.JsonHelper.ToJson(dt);
             }
             return strJson;
-        } 
+        }
+
+        #region 获取明细列表数据
+
+        DBFactory df = new DBFactory();
+        AbstractDB db = null;
+
+        /// <summary>
+        /// 获取当天会话明细列表
+        /// </summary>
+        /// <param name="SessionCode"></param>
+        /// <returns></returns>
+        private DataTable GetDayList(string SessionCode)
+        {
+            db = df.CreateDB("mysql");
+
+            MySqlParameter[] mpara ={
+                new MySqlParameter("SessionCode", SessionCode)
+            };
+            DataTable dt = db.ExecProcedure("slsoft_ias_bus_p_select_day_AccessDetail", mpara);
+            return dt;
+        }
+
+        /// <summary>
+        /// 获取历史会话明细列表
+        /// </summary>
+        /// <param name="SessionCode"></param>
+        /// <returns></returns>
+        private DataTable GetHisList(string SessionCode)
+        {
+            db = df.CreateDB("mysql");
+
+            MySqlParameter[] mpara ={
+                new MySqlParameter("SessionCode", SessionCode)
+            };
+            DataTable dt = db.ExecProcedure("slsoft_ias_bus_p_select_His_AccessDetail", mpara);
+            return dt;
+        }
+        #endregion
     }
 }

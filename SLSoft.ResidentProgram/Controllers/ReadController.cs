@@ -13,42 +13,62 @@ namespace SLSoft.ResidentProgram.Controllers
 {
     public class ReadController : Controller
     {
-        //
+        // 趋势分析（获取指标）
         // GET: /Read/
 
-        public string Index()
+        DBFactory df = new DBFactory();
+        AbstractDB db = null;
+        
+        public string Index(string sId,string startDate,string endDate)
         {
             string strJson = "";
-            string sId = "";
-            string startDate = "";
-            string endDate = "";
-            string callback = "";
 
-            if (Request.QueryString["sId"] != null && Request.QueryString["startDate"] != null && Request.QueryString["endDate"] != null)
+            if (!string.IsNullOrEmpty(sId) && !string.IsNullOrEmpty(startDate) && !string.IsNullOrEmpty(endDate))
             {
-                sId = Request.QueryString["sId"].ToString();
-                startDate = Request.QueryString["startDate"].ToString();
-                endDate = Request.QueryString["endDate"].ToString();
-
-                strJson = GetStatisticalTarget(sId,startDate,endDate,"");
+                strJson = GetList(sId, startDate, endDate);
             }
-            callback = HttpContext.Request["callback"];
+            string callback = HttpContext.Request["callback"];
             return callback+"(" + strJson + ")";
         }
 
         /// <summary>
         /// 统计指标
         /// </summary>
-        /// <param name="sId"></param>
-        /// <param name="starTime"></param>
-        /// <param name="endTime"></param>
-        /// <param name="token"></param>
+        /// <param name="sId">站点ID</param>
+        /// <param name="starTime">开始时间</param>
+        /// <param name="endTime">结束时间</param>
         /// <returns></returns>
-        private string GetStatisticalTarget(string sId, string startDate, string endDate, string token)
+        private string GetList(string sId, string startDate, string endDate)
         {
             string strJson = "";
-            DBFactory df = new DBFactory();
-            AbstractDB db = null;
+            DataTable dt = null;
+
+            if (startDate == DateTime.Now.Date.ToString("yyyy-MM-dd"))
+            {
+                dt = GetTodayList(sId, startDate, endDate);
+            }
+            else
+            {
+                dt = GetHistoryList(sId, startDate, endDate);
+            }
+            
+            if (dt != null && dt.Rows.Count > 0)
+            {
+                strJson = Common.JsonHelper.ToJson(dt);
+            }
+            return strJson;
+        }
+
+        #region 获取指标数据
+        /// <summary>
+        /// 趋势分析（获取当天指标）
+        /// </summary>
+        /// <param name="sId"></param>
+        /// <param name="startDate"></param>
+        /// <param name="endDate"></param>
+        /// <returns></returns>
+        private DataTable GetTodayList(string sId, string startDate, string endDate)
+        {
             db = df.CreateDB("mysql");
 
             MySqlParameter[] mpara ={
@@ -56,13 +76,32 @@ namespace SLSoft.ResidentProgram.Controllers
                 new MySqlParameter("startDate", startDate+" 00:00:00"),
                 new MySqlParameter("endDate",endDate+" 23:59:59")
             };
-            DataTable dt = db.ExecProcedureDateSet("slsoft_ias_bus_p_select_flowanalysis", mpara).Tables[1];
-
-            if (dt != null && dt.Rows.Count > 0)
-            {
-                strJson = Common.JsonHelper.ToJson(dt);
-            }
-            return strJson;
+            DataTable dt = db.ExecProcedureDateSet("slsoft_ias_bus_p_stat_day_TrendIndex", mpara).Tables[1];
+            
+            return dt;
         }
+
+        /// <summary>
+        /// 趋势分析（获取历史指标）
+        /// </summary>
+        /// <param name="sId"></param>
+        /// <param name="startDate"></param>
+        /// <param name="endDate"></param>
+        /// <returns></returns>
+        private DataTable GetHistoryList(string sId, string startDate, string endDate)
+        {
+            db = df.CreateDB("mysql");
+
+            MySqlParameter[] mpara ={
+                new MySqlParameter("SiteID", sId),
+                new MySqlParameter("startDate", startDate),
+                new MySqlParameter("endDate",endDate)
+            };
+            DataTable dt = db.ExecProcedure("slsoft_ias_bus_p_stat_his_TrendIndex", mpara);
+
+            return dt;
+        }
+
+        #endregion
     }
 }

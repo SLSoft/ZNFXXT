@@ -9,30 +9,25 @@ using System.Data;
 
 namespace SLSoft.ResidentProgram.Controllers
 {
-    public class OnLineMaxUVController : Controller
+    public class ColumnPVIndexController : Controller
     {
-        // 当前在线（当天最大UV、最近1分钟UV）
-        // GET: /OnLineMaxUV/
+        // 按栏目浏览量统计（一级栏目）
+        // GET: /ColumnPVIndex/
 
-        public string Index(string sId)
+        public string Index(string startDate, string endDate)
         {
             string strJson = "";
 
-            if (!string.IsNullOrEmpty(sId))
+            if (!string.IsNullOrEmpty(startDate) && !string.IsNullOrEmpty(endDate))
             {
-                strJson = GetInfo(int.Parse(sId));
+                strJson = GetList(startDate, endDate);
             }
+
             string callback = HttpContext.Request["callback"];
             return callback + "(" + strJson + ")";
         }
 
-        /// <summary>
-        /// 获取最近时间最高独立访客
-        /// </summary>
-        /// <param name="SiteID"></param>
-        /// <param name="IntervalTime"></param>
-        /// <returns></returns>
-        private string GetInfo(int SiteID)
+        private string GetList(string startDate, string endDate)
         {
             string strJson = "";
             DBFactory df = new DBFactory();
@@ -40,17 +35,15 @@ namespace SLSoft.ResidentProgram.Controllers
             db = df.CreateDB("mysql");
 
             MySqlParameter[] mpara ={
-                new MySqlParameter("SiteID", SiteID)
+                new MySqlParameter("f_ID","0"),                           
+                new MySqlParameter("startDate", startDate),
+                new MySqlParameter("endDate",endDate)
             };
-            DataTable dt = db.ExecProcedure("slsoft_ias_bus_p_stat_day_OnLineMaxUV", mpara);
+            DataTable dt = db.ExecProcedure("slsoft_ias_bus_p_stat_ColumnPV", mpara);
 
             if (dt != null && dt.Rows.Count > 0)
             {
                 strJson = Common.JsonHelper.ToJson(dt);
-            }
-            else
-            {
-                strJson = "[{CNum:0,highNum:0,time:'00:00'}]";
             }
             return strJson;
         } 

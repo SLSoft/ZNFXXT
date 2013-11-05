@@ -11,32 +11,26 @@ namespace SLSoft.ResidentProgram.Controllers
 {
     public class OnLinePVController : Controller
     {
-        //
+        // 当前在线（最近XX分钟浏览次数、独立访客、IP数量）
         // GET: /OnLinePV/
 
-        public string Index()
+        public string Index(string sId,string iTime)
         {
             string strJson = "";
-            int SiteID = 0;
-            int IntervalTime = 0;
-            string callback = "";
 
-            if (Request.QueryString["sId"] != null && Request.QueryString["iTime"] != null)
+            if (!string.IsNullOrEmpty(sId) && !string.IsNullOrEmpty(iTime))
             {
-                SiteID = int.Parse(Request.QueryString["sId"].ToString());
-                IntervalTime = int.Parse(Request.QueryString["iTime"]);
-
-                strJson = GetInfo(SiteID,IntervalTime);
+                strJson = GetInfo(int.Parse(sId), int.Parse(iTime));
             }
-            callback = HttpContext.Request["callback"];
+            string callback = HttpContext.Request["callback"];
             return callback + "(" + strJson + ")";
         }
 
         /// <summary>
         /// 获取最近XX分钟的浏览次数、独立访客、IP数量
         /// </summary>
-        /// <param name="SiteID"></param>
-        /// <param name="IntervalTime"></param>
+        /// <param name="SiteID">站点ID</param>
+        /// <param name="IntervalTime">最近多少分钟</param>
         /// <returns></returns>
         private string GetInfo(int SiteID, int IntervalTime)
         {
@@ -49,7 +43,7 @@ namespace SLSoft.ResidentProgram.Controllers
                 new MySqlParameter("SiteID", SiteID),
                 new MySqlParameter("IntervalTime", IntervalTime)
             };
-            DataTable dt = db.ExecProcedure("slsoft_ias_bus_p_stat_PV", mpara);
+            DataTable dt = db.ExecProcedure("slsoft_ias_bus_p_stat_day_OnLinePV", mpara);
 
             if (dt != null && dt.Rows.Count > 0)
             {
@@ -61,6 +55,5 @@ namespace SLSoft.ResidentProgram.Controllers
             }
             return strJson;
         } 
-
     }
 }

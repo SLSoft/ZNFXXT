@@ -12,26 +12,18 @@ namespace SLSoft.ResidentProgram.Controllers
 {
     public class TrendByDayController : Controller
     {
-        //
+        // 趋势分析（按天统计）
         // GET: /TrendByDay/
 
-        public string Index()
+        public string Index(string sId, string startDate, string endDate)
         {
             string strJson = "";
-            string sId = "";
-            string startDate = "";
-            string endDate = "";
-            string callback = "";
 
-            if (Request.QueryString["sId"] != null && Request.QueryString["startDate"] != null && Request.QueryString["endDate"] != null)
+            if (!string.IsNullOrEmpty(sId) && !string.IsNullOrEmpty(startDate) && !string.IsNullOrEmpty(endDate))
             {
-                sId = Request.QueryString["sId"].ToString();
-                startDate = Request.QueryString["startDate"].ToString();
-                endDate = Request.QueryString["endDate"].ToString();
-
-                strJson = GetStatisticalTarget(sId, startDate, endDate, "");
+                strJson = GetList(sId, startDate, endDate);
             }
-            callback = HttpContext.Request["callback"];
+            string callback = HttpContext.Request["callback"];
             return callback + "(" + strJson + ")";
         }
 
@@ -43,7 +35,7 @@ namespace SLSoft.ResidentProgram.Controllers
         /// <param name="endTime"></param>
         /// <param name="token"></param>
         /// <returns></returns>
-        private string GetStatisticalTarget(string sId, string startDate, string endDate, string token)
+        private string GetList(string sId, string startDate, string endDate)
         {
             string strJson = "";
             DBFactory df = new DBFactory();
@@ -55,7 +47,7 @@ namespace SLSoft.ResidentProgram.Controllers
                 new MySqlParameter("startDate", startDate),
                 new MySqlParameter("endDate",endDate)
             };
-            DataTable dt = db.ExecProcedure("slsoft_ias_bus_p_select_flowanalysisByDay", mpara);
+            DataTable dt = db.ExecProcedure("slsoft_ias_bus_p_stat_day_Trend", mpara);
 
             if (dt != null && dt.Rows.Count > 0)
             {
@@ -64,7 +56,7 @@ namespace SLSoft.ResidentProgram.Controllers
             return strJson;
         }
 
-
+        #region 数据处理为json格式
         public static string ToJson(DataTable dt)
         {
             StringBuilder jsonString = new StringBuilder();
@@ -105,5 +97,6 @@ namespace SLSoft.ResidentProgram.Controllers
             jsonString.Append("]");
             return jsonString.ToString();
         }
+        #endregion
     }
 }
